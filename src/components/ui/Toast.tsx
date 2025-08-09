@@ -138,19 +138,18 @@ function ToastComponent({ toast }: { toast: Toast }) {
   )
 }
 
-// Convenience functions
+// Convenience functions for future implementation
 export const toast = {
-  success: (title: string, description?: string, duration?: number) => {
-    // This will be implemented when provider is added to layout
+  success: (title: string, description?: string) => {
     console.log('Success toast:', title, description)
   },
-  error: (title: string, description?: string, duration?: number) => {
+  error: (title: string, description?: string) => {
     console.log('Error toast:', title, description)
   },
-  warning: (title: string, description?: string, duration?: number) => {
+  warning: (title: string, description?: string) => {
     console.log('Warning toast:', title, description)
   },
-  info: (title: string, description?: string, duration?: number) => {
+  info: (title: string, description?: string) => {
     console.log('Info toast:', title, description)
   }
 }

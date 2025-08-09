@@ -1,4 +1,4 @@
-import { HTMLAttributes, forwardRef, ReactNode } from 'react'
+import { HTMLAttributes, forwardRef } from 'react'
 import { cn } from '@/lib/utils'
 
 interface CardProps extends HTMLAttributes<HTMLDivElement> {
@@ -7,9 +7,15 @@ interface CardProps extends HTMLAttributes<HTMLDivElement> {
   hover?: boolean
 }
 
-interface CardHeaderProps extends HTMLAttributes<HTMLDivElement> {}
-interface CardContentProps extends HTMLAttributes<HTMLDivElement> {}
-interface CardFooterProps extends HTMLAttributes<HTMLDivElement> {}
+interface CardHeaderProps extends HTMLAttributes<HTMLDivElement> {
+  children?: React.ReactNode
+}
+interface CardContentProps extends HTMLAttributes<HTMLDivElement> {
+  children?: React.ReactNode
+}
+interface CardFooterProps extends HTMLAttributes<HTMLDivElement> {
+  children?: React.ReactNode
+}
 
 const Card = forwardRef<HTMLDivElement, CardProps>(
   ({ className, variant = 'default', padding = 'md', hover = false, ...props }, ref) => {

@@ -1,9 +1,10 @@
+'use client'
+
 import { formatCurrency, formatNumber } from '@/lib/utils'
 import { Download, Calendar, Plus, RefreshCw } from 'lucide-react'
 import Button from '@/components/ui/Button'
 import Badge from '@/components/ui/Badge'
 import { Card, CardHeader, CardContent, CardTitle, CardDescription } from '@/components/ui/Card'
-import { useToast } from '@/components/ui/Toast'
 
 // Mock data matching multiorders screenshots
 const dashboardMetrics = {
@@ -36,8 +37,6 @@ const salesByChannel = [
 ]
 
 export default function DashboardPage() {
-  const { addToast } = useToast()
-
   const handleTestToast = (type: 'success' | 'error' | 'warning' | 'default') => {
     const messages = {
       success: { title: 'Order Updated!', description: 'Order #1234 has been successfully shipped.' },
@@ -45,7 +44,8 @@ export default function DashboardPage() {
       warning: { title: 'Low Stock Alert', description: '3 products are running low on inventory.' },
       default: { title: 'System Notice', description: 'Regular maintenance scheduled for tonight.' }
     }
-    addToast({ ...messages[type], variant: type === 'default' ? 'default' : type })
+    // For now, just console log instead of using toast
+    console.log('Toast would show:', messages[type])
   }
 
   return (
