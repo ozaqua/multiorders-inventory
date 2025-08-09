@@ -1,6 +1,9 @@
 import { formatCurrency, formatNumber } from '@/lib/utils'
-import { Download, Calendar } from 'lucide-react'
+import { Download, Calendar, Plus, RefreshCw } from 'lucide-react'
 import Button from '@/components/ui/Button'
+import Badge from '@/components/ui/Badge'
+import { Card, CardHeader, CardContent, CardTitle, CardDescription } from '@/components/ui/Card'
+import { useToast } from '@/components/ui/Toast'
 
 // Mock data matching multiorders screenshots
 const dashboardMetrics = {
@@ -33,6 +36,18 @@ const salesByChannel = [
 ]
 
 export default function DashboardPage() {
+  const { addToast } = useToast()
+
+  const handleTestToast = (type: 'success' | 'error' | 'warning' | 'default') => {
+    const messages = {
+      success: { title: 'Order Updated!', description: 'Order #1234 has been successfully shipped.' },
+      error: { title: 'Sync Failed', description: 'Unable to connect to eBay API. Please check your credentials.' },
+      warning: { title: 'Low Stock Alert', description: '3 products are running low on inventory.' },
+      default: { title: 'System Notice', description: 'Regular maintenance scheduled for tonight.' }
+    }
+    addToast({ ...messages[type], variant: type === 'default' ? 'default' : type })
+  }
+
   return (
     <div className="p-6 max-w-7xl mx-auto">
       {/* Header */}
@@ -49,11 +64,52 @@ export default function DashboardPage() {
             </select>
           </div>
         </div>
-        <Button variant="outline" size="sm">
-          <Download className="h-4 w-4 mr-2" />
-          Dashboard Options
-        </Button>
+        <div className="flex items-center space-x-2">
+          <Button variant="outline" size="sm" leftIcon={<Download className="h-4 w-4" />}>
+            Dashboard Options
+          </Button>
+          <Button variant="primary" size="sm" leftIcon={<Plus className="h-4 w-4" />}>
+            Quick Add
+          </Button>
+        </div>
       </div>
+
+      {/* Enhanced Components Demo */}
+      <Card className="mb-6" variant="elevated" hover>
+        <CardHeader>
+          <CardTitle>Enhanced UI Components Demo</CardTitle>
+          <CardDescription>
+            Testing the new Button, Badge, Card, and Toast components with loading states and icons.
+          </CardDescription>
+        </CardHeader>
+        <CardContent>
+          <div className="flex flex-wrap gap-3 mb-4">
+            <Badge variant="success" dot>Active</Badge>
+            <Badge variant="warning" size="sm">Low Stock</Badge>
+            <Badge variant="error" size="lg">Out of Stock</Badge>
+            <Badge variant="info" dot>In Transit</Badge>
+          </div>
+          <div className="flex flex-wrap gap-2">
+            <Button variant="success" size="sm" onClick={() => handleTestToast('success')}>
+              Success Toast
+            </Button>
+            <Button variant="danger" size="sm" onClick={() => handleTestToast('error')}>
+              Error Toast  
+            </Button>
+            <Button variant="secondary" size="sm" onClick={() => handleTestToast('warning')}>
+              Warning Toast
+            </Button>
+            <Button 
+              variant="outline" 
+              size="sm" 
+              loading 
+              leftIcon={<RefreshCw className="h-4 w-4" />}
+            >
+              Loading Button
+            </Button>
+          </div>
+        </CardContent>
+      </Card>
 
       {/* Order Status Cards */}
       <div className="mb-8">
