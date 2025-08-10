@@ -743,23 +743,6 @@ async function main() {
     }),
     prisma.platformIntegration.create({
       data: {
-        platform: 'EBAY',
-        status: 'LIVE',
-        syncEnabled: true,
-        productCount: 89,
-        lastSync: new Date(),
-      },
-    }),
-    prisma.platformIntegration.create({
-      data: {
-        platform: 'SHOPIFY',
-        status: 'INTEGRATING',
-        syncEnabled: false,
-        productCount: 0,
-      },
-    }),
-    prisma.platformIntegration.create({
-      data: {
         platform: 'SHOPIFY',
         status: 'LIVE',
         syncEnabled: true,
