@@ -21,6 +21,8 @@ When starting a new Claude Code session to continue work on this project:
 ### Quick Context Prompt for New Sessions:
 ```
 I'm continuing work on my multiorders-inspired inventory management system. Please read the MULTIORDERS_PROJECT_PROGRESS.md file at '/Users/kevin/claude projects/project001/MULTIORDERS_PROJECT_PROGRESS.md' to understand the current status. The working application is in '/Users/kevin/claude projects/multiorders-inventory' and is 100% complete with full database integration.
+
+IMPORTANT: Platform support has been simplified to only eBay, Shopify, and Etsy (removed Amazon and Wix). Recent fixes resolved Vercel deployment errors. Changes are committed locally and ready to push to GitHub for automatic Vercel deployment.
 ```
 
 ## 🛠 Development Commands
