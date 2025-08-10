@@ -1,0 +1,396 @@
+// Prisma schema for Multiorders Inventory Management System
+// Supports multi-platform e-commerce inventory management
+
+generator client {
+  provider = "prisma-client-js"
+  output   = "../src/generated/prisma"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+// Core product model supporting simple, configurable, bundled, and merged products
+model Product {
+  id          String      @id @default(cuid())
+  name        String
+  sku         String      @unique
+  image       String?
+  category    ProductCategory
+  description String?
+  
+  // Inventory tracking
+  warehouse   WarehouseStock?
+  reorderPoint Int?       @default(0)
+  tag         String?
+  
+  // Product metadata
+  asin        String?
+  weight      Float?
+  weightUnit  String?     @default("kg")
+  
+  // Supplier information
+  supplier    Supplier?   @relation(fields: [supplierId], references: [id])
+  supplierId  String?
+  buyPrice    Float?
+  
+  // Multi-platform pricing
+  prices      ProductPrice[]
+  
+  // Product relationships
+  bundleComponents BundleComponent[] @relation("BundleComponentProduct")
+  inBundles   BundleComponent[] @relation("BundleComponentParent") 
+  
+  // Platform integrations
+  platformProducts PlatformProduct[]
+  
+  // Order relationships
+  orderItems  OrderItem[]
+  
+  // Audit fields
+  status      ProductStatus @default(ACTIVE)
+  createdAt   DateTime      @default(now())
+  updatedAt   DateTime      @updatedAt
+  
+  @@map("products")
+}
+
+// Separate warehouse stock model for better inventory tracking
+model WarehouseStock {
+  id          String  @id @default(cuid())
+  productId   String  @unique
+  product     Product @relation(fields: [productId], references: [id], onDelete: Cascade)
+  
+  total       Int     @default(0)
+  inOrder     Int     @default(0)
+  available   Int     @default(0)
+  awaiting    Int     @default(0)
+  reserved    Int     @default(0)
+  
+  // Warehouse location
+  binLocation String?
+  
+  // Audit fields
+  updatedAt   DateTime @updatedAt
+  
+  @@map("warehouse_stock")
+}
+
+// Multi-platform pricing model
+model ProductPrice {
+  id        String   @id @default(cuid())
+  productId String
+  product   Product  @relation(fields: [productId], references: [id], onDelete: Cascade)
+  
+  platform  Platform
+  price     Float
+  currency  String   @default("USD")
+  
+  // Pricing metadata
+  isActive  Boolean  @default(true)
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+  
+  @@unique([productId, platform])
+  @@map("product_prices")
+}
+
+// Bundle components for bundled products
+model BundleComponent {
+  id              String  @id @default(cuid())
+  
+  // Parent bundle product
+  bundleId        String
+  bundle          Product @relation("BundleComponentParent", fields: [bundleId], references: [id], onDelete: Cascade)
+  
+  // Component product
+  componentId     String
+  component       Product @relation("BundleComponentProduct", fields: [componentId], references: [id], onDelete: Cascade)
+  
+  quantityNeeded  Int
+  
+  @@unique([bundleId, componentId])
+  @@map("bundle_components")
+}
+
+// Platform-specific product mappings
+model PlatformProduct {
+  id              String   @id @default(cuid())
+  productId       String
+  product         Product  @relation(fields: [productId], references: [id], onDelete: Cascade)
+  
+  platform        Platform
+  platformSku     String?  // Platform-specific SKU
+  platformId      String?  // Platform's internal product ID
+  
+  // Platform-specific data
+  title           String?
+  description     String?
+  isListed        Boolean  @default(false)
+  lastSync        DateTime?
+  
+  createdAt       DateTime @default(now())
+  updatedAt       DateTime @updatedAt
+  
+  @@unique([productId, platform])
+  @@map("platform_products")
+}
+
+// Customer model
+model Customer {
+  id            String         @id @default(cuid())
+  name          String
+  email         String         @unique
+  phone         String?
+  
+  // Address information
+  address       CustomerAddress?
+  
+  // Customer statistics
+  totalOrders   Int            @default(0)
+  totalSpent    Float          @default(0)
+  lastOrderDate DateTime?
+  
+  // Customer metadata
+  status        CustomerStatus @default(ACTIVE)
+  tags          CustomerTag[]
+  platforms     CustomerPlatform[]
+  
+  // Relationships
+  orders        Order[]
+  
+  // Audit fields
+  createdAt     DateTime       @default(now())
+  updatedAt     DateTime       @updatedAt
+  
+  @@map("customers")
+}
+
+// Customer address model
+model CustomerAddress {
+  id         String   @id @default(cuid())
+  customerId String   @unique
+  customer   Customer @relation(fields: [customerId], references: [id], onDelete: Cascade)
+  
+  street     String
+  city       String
+  state      String
+  zip        String
+  country    String
+  
+  updatedAt  DateTime @updatedAt
+  
+  @@map("customer_addresses")
+}
+
+// Customer tags for segmentation
+model CustomerTag {
+  id         String    @id @default(cuid())
+  customerId String
+  customer   Customer  @relation(fields: [customerId], references: [id], onDelete: Cascade)
+  
+  tag        String
+  createdAt  DateTime  @default(now())
+  
+  @@unique([customerId, tag])
+  @@map("customer_tags")
+}
+
+// Customer platform associations
+model CustomerPlatform {
+  id         String    @id @default(cuid())
+  customerId String
+  customer   Customer  @relation(fields: [customerId], references: [id], onDelete: Cascade)
+  
+  platform   Platform
+  platformCustomerId String?
+  
+  createdAt  DateTime  @default(now())
+  
+  @@unique([customerId, platform])
+  @@map("customer_platforms")
+}
+
+// Order model
+model Order {
+  id           String      @id @default(cuid())
+  orderId      String      @unique  // External order ID from platform
+  
+  // Customer information
+  customerId   String
+  customer     Customer    @relation(fields: [customerId], references: [id])
+  
+  // Platform and order details
+  platform     Platform
+  status       OrderStatus @default(NEW)
+  
+  // Financial information
+  total        Float
+  currency     String      @default("USD")
+  paid         Boolean     @default(false)
+  
+  // Shipping information
+  trackingNumber String?
+  shippingAddress OrderShippingAddress?
+  
+  // Order items
+  items        OrderItem[]
+  
+  // Audit fields
+  orderDate    DateTime    @default(now())
+  createdAt    DateTime    @default(now())
+  updatedAt    DateTime    @updatedAt
+  
+  @@map("orders")
+}
+
+// Order shipping address
+model OrderShippingAddress {
+  id      String @id @default(cuid())
+  orderId String @unique
+  order   Order  @relation(fields: [orderId], references: [id], onDelete: Cascade)
+  
+  name    String
+  street  String
+  city    String
+  state   String
+  zip     String
+  country String
+  
+  @@map("order_shipping_addresses")
+}
+
+// Order items model
+model OrderItem {
+  id          String  @id @default(cuid())
+  orderId     String
+  order       Order   @relation(fields: [orderId], references: [id], onDelete: Cascade)
+  
+  // Product information
+  productId   String?
+  product     Product? @relation(fields: [productId], references: [id])
+  
+  productName String
+  sku         String?
+  quantity    Int
+  price       Float
+  
+  @@map("order_items")
+}
+
+// Supplier model
+model Supplier {
+  id          String    @id @default(cuid())
+  name        String
+  email       String?
+  phone       String?
+  address     String?
+  
+  // Supplier metadata
+  isActive    Boolean   @default(true)
+  notes       String?
+  
+  // Relationships
+  products    Product[]
+  
+  // Audit fields
+  createdAt   DateTime  @default(now())
+  updatedAt   DateTime  @updatedAt
+  
+  @@map("suppliers")
+}
+
+// Platform integrations model
+model PlatformIntegration {
+  id            String            @id @default(cuid())
+  platform      Platform          @unique
+  
+  // Integration status
+  status        IntegrationStatus @default(DISCONNECTED)
+  region        String?
+  
+  // API credentials (encrypted)
+  credentials   String?           // JSON encrypted credentials
+  
+  // Sync information
+  lastSync      DateTime?
+  syncEnabled   Boolean           @default(false)
+  productCount  Int               @default(0)
+  
+  // Error tracking
+  lastError     String?
+  errorCount    Int               @default(0)
+  
+  // Audit fields
+  createdAt     DateTime          @default(now())
+  updatedAt     DateTime          @updatedAt
+  
+  @@map("platform_integrations")
+}
+
+// Analytics and dashboard metrics cache
+model DashboardMetric {
+  id            String   @id @default(cuid())
+  metricType    String   // e.g., "daily_sales", "monthly_orders", etc.
+  date          DateTime
+  
+  // Metric values
+  intValue      Int?
+  floatValue    Float?
+  stringValue   String?
+  jsonValue     String?  // For complex metrics
+  
+  // Metadata
+  platform      Platform?
+  createdAt     DateTime @default(now())
+  
+  @@unique([metricType, date, platform])
+  @@map("dashboard_metrics")
+}
+
+// Enums
+enum ProductCategory {
+  SIMPLE
+  CONFIGURABLE
+  MERGED
+  BUNDLED
+}
+
+enum ProductStatus {
+  ACTIVE
+  INACTIVE
+  LOW_STOCK
+  OUT_OF_STOCK
+}
+
+enum Platform {
+  AMAZON
+  EBAY
+  SHOPIFY
+  WIX
+  ETSY
+  MULTIORDERS
+}
+
+enum CustomerStatus {
+  ACTIVE
+  INACTIVE
+}
+
+enum OrderStatus {
+  NEW
+  PREPARED
+  IN_PROGRESS
+  PENDING
+  SHIPPED
+  CANCELLED
+  COMPLETED
+}
+
+enum IntegrationStatus {
+  LIVE
+  INTEGRATING
+  ERRORED
+  DISCONNECTED
+}

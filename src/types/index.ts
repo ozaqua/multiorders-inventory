@@ -1,6 +1,35 @@
-// Core entities based on multiorders screenshots
+// Re-export database types for use throughout the application
+export type {
+  Product,
+  WarehouseStock,
+  ProductPrice,
+  BundleComponent,
+  PlatformProduct,
+  Customer,
+  CustomerAddress,
+  CustomerTag,
+  CustomerPlatform,
+  Order,
+  OrderItem,
+  OrderShippingAddress,
+  Supplier,
+  PlatformIntegration,
+  DashboardMetric,
+  ProductCategory,
+  ProductStatus,
+  Platform,
+  CustomerStatus,
+  OrderStatus,
+  IntegrationStatus,
+} from '../generated/prisma'
 
-export interface Product {
+// Re-export enhanced types from database operations
+export type { ProductWithRelations } from '../lib/database/products'
+export type { CustomerWithRelations } from '../lib/database/customers'
+export type { OrderWithRelations } from '../lib/database/orders'
+
+// Legacy types for backward compatibility (will be updated in components)
+export interface LegacyProduct {
   id: string
   name: string
   sku: string
@@ -32,13 +61,13 @@ export interface Product {
   updatedAt: Date
 }
 
-export interface Bundle extends Product {
+export interface LegacyBundle extends LegacyProduct {
   category: 'bundled'
-  components: BundleComponent[]
+  components: LegacyBundleComponent[]
   retailPrice: number
 }
 
-export interface BundleComponent {
+export interface LegacyBundleComponent {
   productId: string
   productName: string
   sku: string
@@ -46,7 +75,7 @@ export interface BundleComponent {
   availableStock: number
 }
 
-export interface Order {
+export interface LegacyOrder {
   id: string
   orderId: string
   platform: 'amazon' | 'ebay' | 'shopify' | 'wix' | 'etsy'
@@ -55,7 +84,7 @@ export interface Order {
     email?: string
     address: string
   }
-  items: OrderItem[]
+  items: LegacyOrderItem[]
   status: 'new' | 'prepared' | 'in-progress' | 'pending' | 'shipped' | 'cancelled'
   total: number
   currency: string
@@ -64,7 +93,7 @@ export interface Order {
   paid: boolean
 }
 
-export interface OrderItem {
+export interface LegacyOrderItem {
   productName: string
   sku?: string
   quantity: number
@@ -79,6 +108,7 @@ export interface DashboardMetrics {
   lowStock: number
   returnCustomers: number
   newClients: number
+  returnCustomersPercent?: number
 }
 
 export interface SalesData {

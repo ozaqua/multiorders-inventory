@@ -1,8 +1,8 @@
 'use client'
 
-import { useState } from 'react'
-import { mockProducts, multiChannelProducts } from '@/lib/mockData'
-import { Product } from '@/types'
+import { useState, useEffect } from 'react'
+import { getAllProducts, getProductsByCategory } from '@/lib/database/products'
+import type { ProductWithRelations, ProductCategory } from '@/types'
 import Button from '@/components/ui/Button'
 import Badge from '@/components/ui/Badge'
 import { 
@@ -38,30 +38,81 @@ const platforms = [
 export default function InventoryPage() {
   const [activeCategory, setActiveCategory] = useState('all')
   const [searchTerm, setSearchTerm] = useState('')
-  const [products] = useState<Product[]>([...mockProducts, ...multiChannelProducts])
+  const [products, setProducts] = useState<ProductWithRelations[]>([])
+  const [loading, setLoading] = useState(true)
+  const [error, setError] = useState<string | null>(null)
+
+  useEffect(() => {
+    async function fetchProducts() {
+      try {
+        setLoading(true)
+        let productsData: ProductWithRelations[]
+        
+        if (activeCategory === 'all') {
+          productsData = await getAllProducts()
+        } else {
+          productsData = await getProductsByCategory(activeCategory.toUpperCase() as ProductCategory)
+        }
+        
+        setProducts(productsData)
+      } catch (err) {
+        console.error('Error fetching products:', err)
+        setError('Failed to load products')
+      } finally {
+        setLoading(false)
+      }
+    }
+
+    fetchProducts()
+  }, [activeCategory])
 
   const filteredProducts = products.filter(product => {
-    const matchesCategory = activeCategory === 'all' || product.category === activeCategory
     const matchesSearch = product.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
                          product.sku.toLowerCase().includes(searchTerm.toLowerCase())
-    return matchesCategory && matchesSearch
+    return matchesSearch
   })
 
-  const getPlatformBadge = (store: string) => {
-    const platform = platforms.find(p => p.name === store.toLowerCase())
+  const getPlatformBadge = (platformName: string) => {
+    const platform = platforms.find(p => p.name === platformName.toLowerCase())
     if (!platform) return null
     
     return (
-      <div key={store} className={`w-6 h-6 rounded flex items-center justify-center ${platform.color} ${platform.textColor} text-xs font-bold`}>
-        {store.charAt(0).toUpperCase()}
+      <div key={platformName} className={`w-6 h-6 rounded flex items-center justify-center ${platform.color} ${platform.textColor} text-xs font-bold`}>
+        {platformName.charAt(0).toUpperCase()}
       </div>
     )
+  }
+
+  // Get platforms from product prices
+  const getProductPlatforms = (product: ProductWithRelations): string[] => {
+    return product.prices.map(price => price.platform.toLowerCase())
   }
 
   const getStockColor = (available: number, total: number) => {
     if (available <= 0) return 'text-red-600 bg-red-50'
     if (available < total * 0.2) return 'text-yellow-600 bg-yellow-50'
     return 'text-green-600 bg-green-50'
+  }
+
+  if (loading) {
+    return (
+      <div className="p-6 max-w-7xl mx-auto">
+        <div className="flex items-center justify-center h-64">
+          <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-500"></div>
+          <span className="ml-2 text-gray-600">Loading products...</span>
+        </div>
+      </div>
+    )
+  }
+
+  if (error) {
+    return (
+      <div className="p-6 max-w-7xl mx-auto">
+        <div className="bg-red-50 border border-red-200 rounded-lg p-4">
+          <div className="text-red-800">{error}</div>
+        </div>
+      </div>
+    )
   }
 
   return (
@@ -229,7 +280,7 @@ export default function InventoryPage() {
                   </td>
                   <td className="px-6 py-4 whitespace-nowrap">
                     <div className="flex space-x-1">
-                      {product.store.map(store => getPlatformBadge(store))}
+                      {getProductPlatforms(product).map(platform => getPlatformBadge(platform))}
                     </div>
                   </td>
                   <td className="px-6 py-4">
@@ -253,13 +304,13 @@ export default function InventoryPage() {
                   <td className="px-6 py-4 whitespace-nowrap">
                     <div className="grid grid-cols-3 gap-2 text-sm">
                       <span className="font-medium text-gray-900">
-                        {product.warehouse.total}
+                        {product.warehouse?.total || 0}
                       </span>
                       <span className="text-gray-600">
-                        {product.warehouse.inOrder}
+                        {product.warehouse?.inOrder || 0}
                       </span>
-                      <span className={`font-medium px-2 py-1 rounded text-center ${getStockColor(product.warehouse.available, product.warehouse.total)}`}>
-                        {product.warehouse.available}
+                      <span className={`font-medium px-2 py-1 rounded text-center ${getStockColor(product.warehouse?.available || 0, product.warehouse?.total || 0)}`}>
+                        {product.warehouse?.available || 0}
                       </span>
                     </div>
                   </td>
@@ -272,9 +323,9 @@ export default function InventoryPage() {
                   </td>
                   <td className="px-6 py-4 whitespace-nowrap">
                     <div className="space-y-1">
-                      {Object.entries(product.price).map(([platform, price]) => (
-                        <div key={platform} className="text-sm">
-                          <span className="font-medium">£{price}</span>
+                      {product.prices.map((price) => (
+                        <div key={price.platform} className="text-sm">
+                          <span className="font-medium">${price.price}</span>
                         </div>
                       ))}
                     </div>

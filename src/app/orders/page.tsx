@@ -1,229 +1,237 @@
 'use client'
 
-import { useState } from 'react'
-import { Order } from '@/types'
+import { useState, useEffect } from 'react'
+import type { OrderWithRelations } from '@/lib/database/orders'
+import { getAllOrders } from '@/lib/database/orders'
 import Button from '@/components/ui/Button'
 import Badge from '@/components/ui/Badge'
 import { 
   Search,
   Filter,
   Columns3,
-  SortDesc,
-  Printer,
-  Mail,
-  MoreHorizontal,
-  Download,
-  Upload,
-  Plus,
   Eye
 } from 'lucide-react'
-import { formatCurrency, formatDate } from '@/lib/utils'
+import { formatCurrency, formatDate, cn } from '@/lib/utils'
 
-// Mock orders data matching multiorders screenshots
-const mockOrders: Order[] = [
+export default function OrdersPage() {
+  const [orders, setOrders] = useState<OrderWithRelations[]>([])
+  const [loading, setLoading] = useState(true)
+  const [error, setError] = useState<string | null>(null)
+  // Additional state for UI
+  const [activeTab, setActiveTab] = useState('all')
+  const [searchTerm, setSearchTerm] = useState('')
+
+  useEffect(() => {
+    async function fetchOrders() {
+      try {
+        const fetchedOrders = await getAllOrders()
+        setOrders(fetchedOrders)
+      } catch (err) {
+        console.error('Failed to fetch orders:', err)
+        setError('Failed to load orders')
+        // Use fallback empty data for now
+        setOrders([])
+      } finally {
+        setLoading(false)
+      }
+    }
+    
+    fetchOrders()
+  }, [])
+
+  if (loading) {
+    return (
+      <div className="p-6 max-w-7xl mx-auto">
+        <div className="text-center py-8">Loading orders...</div>
+      </div>
+    )
+  }
+
+  if (error) {
+    return (
+      <div className="p-6 max-w-7xl mx-auto">
+        <div className="text-center py-8 text-red-600">
+          {error}
+          <div className="mt-4 text-sm text-gray-500">
+            This feature requires database setup. See documentation for setup instructions.
+          </div>
+        </div>
+      </div>
+    )
+  }
+
+  // Temporary fallback orders for demonstration
+  const mockOrders: OrderWithRelations[] = [
   {
     id: '1',
+    createdAt: new Date('2025-12-02T17:41:00'),
+    updatedAt: new Date('2025-12-02T17:41:00'),
     orderId: '10086',
-    platform: 'wix',
+    customerId: '1',
+    platform: 'WIX',
+    status: 'NEW',
+    total: 78.00,
+    currency: 'USD',
+    paid: true,
+    trackingNumber: null,
+    orderDate: new Date('2025-12-02T17:41:00'),
     customer: {
+      id: '1',
       name: 'Tom Jackson',
-      email: 'tom13jackson14@gmail.com',
-      address: '14144 New street, Gendville, NY 90111, United States'
+      email: 'tom13jackson14@gmail.com'
     },
     items: [
       {
+        id: '1',
         productName: 'Bomber Jacket',
         quantity: 1,
         price: 78.00
       }
-    ],
-    status: 'new',
-    total: 78.00,
-    currency: 'USD',
-    date: new Date('2025-12-02T17:41:00'),
-    paid: true
-  },
-  {
-    id: '2',
-    orderId: '156845',
-    platform: 'wix',
-    customer: {
-      name: 'Customer Name',
-      address: 'Customer Address'
-    },
-    items: [
-      {
-        productName: 'Manganiello Shirt',
-        quantity: 2,
-        price: 88.00
-      }
-    ],
-    status: 'new',
-    total: 176.00,
-    currency: 'USD',
-    date: new Date('2025-12-02T17:41:00'),
-    paid: true
-  },
-  {
-    id: '3',
-    orderId: '69863',
-    platform: 'wix',
-    customer: {
-      name: 'Customer Name',
-      address: 'Customer Address'
-    },
-    items: [
-      {
-        productName: 'Leather Vest',
-        quantity: 1,
-        price: 119.00
-      }
-    ],
-    status: 'new',
-    total: 119.00,
-    currency: 'USD',
-    date: new Date('2025-12-02T17:41:00'),
-    paid: true
-  },
-  {
-    id: '4',
-    orderId: '121271',
-    platform: 'wix',
-    customer: {
-      name: 'Customer Name',
-      address: 'Customer Address'
-    },
-    items: [
-      {
-        productName: 'SweetPrint Jacket',
-        quantity: 1,
-        price: 99.00
-      }
-    ],
-    status: 'new',
-    total: 99.00,
-    currency: 'USD',
-    date: new Date('2025-12-02T17:41:00'),
-    paid: true
-  },
-  {
-    id: '5',
-    orderId: '121251',
-    platform: 'wix',
-    customer: {
-      name: 'Customer Name',
-      address: 'Customer Address'
-    },
-    items: [
-      {
-        productName: 'T-Shirt',
-        quantity: 1,
-        price: 69.00
-      }
-    ],
-    status: 'in-progress',
-    total: 69.00,
-    currency: 'USD',
-    date: new Date('2025-12-02T17:41:00'),
-    paid: true
-  },
-  {
-    id: '6',
-    orderId: '111-1481331-2363411',
-    platform: 'amazon',
-    customer: {
-      name: 'Customer Name',
-      address: 'Customer Address'
-    },
-    items: [
-      {
-        productName: 'Leather Vest',
-        quantity: 1,
-        price: 107.51
-      }
-    ],
-    status: 'in-progress',
-    total: 107.51,
-    currency: 'USD',
-    date: new Date('2025-12-02T17:41:00'),
-    paid: true
-  },
-  {
-    id: '7',
-    orderId: '121191',
-    platform: 'wix',
-    customer: {
-      name: 'Customer Name',
-      address: 'Customer Address'
-    },
-    items: [
-      {
-        productName: 'Crochet Shirt',
-        quantity: 1,
-        price: 93.84
-      }
-    ],
-    status: 'cancelled',
-    total: 93.84,
-    currency: 'USD',
-    date: new Date('2025-12-02T17:41:00'),
-    paid: true
-  },
-  {
-    id: '8',
-    orderId: '112-1475613-0439468',
-    platform: 'amazon',
-    customer: {
-      name: 'Customer Name',
-      address: 'Customer Address'
-    },
-    items: [
-      {
-        productName: 'Blazer Jacket',
-        quantity: 1,
-        price: 135.31
-      }
-    ],
-    status: 'shipped',
-    total: 135.31,
-    currency: 'USD',
-    date: new Date('2025-12-02T17:41:00'),
-    trackingNumber: '584548567631',
-    paid: true
-  },
-  {
-    id: '9',
-    orderId: '10021',
-    platform: 'wix',
-    customer: {
-      name: 'Customer Name',
-      address: 'Customer Address'
-    },
-    items: [
-      {
-        productName: 'Connect Jacket',
-        quantity: 1,
-        price: 99.00
-      }
-    ],
-    status: 'in-progress',
-    total: 99.00,
-    currency: 'USD',
-    date: new Date('2025-12-02T17:41:00'),
-    paid: true
+    ]
   }
 ]
 
-const orderStatusTabs = [
-  { id: 'new', label: 'New', count: 4 },
-  { id: 'in-progress', label: 'In-Progress', count: 113 },
-  { id: 'shipped', label: 'Shipped', count: 0 },
-  { id: 'all', label: 'All', count: 0 },
-  { id: 'amazon-mcf', label: 'Amazon MCF', count: 0 },
-  { id: 'amazon-fba', label: 'Amazon FBA', count: 0 },
-  { id: 'cancelled', label: 'Cancelled', count: 0 },
-  { id: 'pending', label: 'Pending', count: 1459 }
-]
+  // Use database orders if available, otherwise fallback to mock data
+  const currentOrders = orders.length > 0 ? orders : mockOrders
+  const filteredOrders = currentOrders.filter(order => {
+    const matchesSearch = searchTerm === '' || 
+      order.orderId.toLowerCase().includes(searchTerm.toLowerCase()) ||
+      order.customer.name.toLowerCase().includes(searchTerm.toLowerCase())
+    
+    const matchesTab = activeTab === 'all' || 
+      (activeTab === 'new' && order.status === 'NEW') ||
+      (activeTab === 'in-progress' && order.status === 'IN_PROGRESS') ||
+      (activeTab === 'shipped' && order.status === 'SHIPPED')
+    
+    return matchesSearch && matchesTab
+  })
+
+  return (
+    <div className="p-6 max-w-7xl mx-auto">
+      {/* Header with search and filters */}
+      <div className="flex items-center justify-between mb-6">
+        <h1 className="text-2xl font-semibold text-gray-900">Orders</h1>
+        <div className="flex items-center space-x-4">
+          <div className="relative">
+            <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 h-4 w-4" />
+            <input
+              type="text"
+              placeholder="Search orders..."
+              value={searchTerm}
+              onChange={(e) => setSearchTerm(e.target.value)}
+              className="pl-10 pr-4 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+            />
+          </div>
+          <Button variant="outline" size="sm">
+            <Filter className="h-4 w-4 mr-2" />
+            Filters
+          </Button>
+          <Button variant="outline" size="sm">
+            <Columns3 className="h-4 w-4 mr-2" />
+            Columns
+          </Button>
+        </div>
+      </div>
+
+      {/* Order count and pagination info */}
+      <div className="mb-4">
+        <p className="text-sm text-gray-600">Showing {filteredOrders.length} orders</p>
+      </div>
+
+      {/* Status tabs */}
+      <div className="border-b border-gray-200 mb-6">
+        <nav className="-mb-px flex space-x-8">
+          {[
+            { id: 'all', name: 'All', count: currentOrders.length },
+            { id: 'new', name: 'New', count: currentOrders.filter(o => o.status === 'NEW').length },
+            { id: 'in-progress', name: 'In Progress', count: currentOrders.filter(o => o.status === 'IN_PROGRESS').length },
+            { id: 'shipped', name: 'Shipped', count: currentOrders.filter(o => o.status === 'SHIPPED').length }
+          ].map(tab => (
+            <button
+              key={tab.id}
+              onClick={() => setActiveTab(tab.id)}
+              className={cn(
+                'whitespace-nowrap py-4 px-1 border-b-2 font-medium text-sm',
+                activeTab === tab.id
+                  ? 'border-blue-500 text-blue-600'
+                  : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300'
+              )}
+            >
+              {tab.name} ({tab.count})
+            </button>
+          ))}
+        </nav>
+      </div>
+
+      {/* Orders table */}
+      <div className="bg-white rounded-lg border border-gray-200 overflow-hidden">
+        <table className="min-w-full divide-y divide-gray-200">
+          <thead className="bg-gray-50">
+            <tr>
+              <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Order</th>
+              <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Customer</th>
+              <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Items</th>
+              <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Status</th>
+              <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Date</th>
+              <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Total</th>
+              <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Actions</th>
+            </tr>
+          </thead>
+          <tbody className="bg-white divide-y divide-gray-200">
+            {filteredOrders.map((order) => (
+              <tr key={order.id} className="hover:bg-gray-50">
+                <td className="px-6 py-4 whitespace-nowrap">
+                  <div>
+                    <div className="text-sm font-medium text-gray-900">#{order.orderId}</div>
+                    {getPlatformBadge(order.platform)}
+                  </div>
+                </td>
+                <td className="px-6 py-4 whitespace-nowrap">
+                  <div>
+                    <div className="text-sm font-medium text-gray-900">{order.customer.name}</div>
+                    <div className="text-sm text-gray-500">{order.customer.email}</div>
+                  </div>
+                </td>
+                <td className="px-6 py-4">
+                  <div className="text-sm text-gray-900">
+                    {order.items.map((item, index) => (
+                      <div key={index}>
+                        {item.quantity}x {item.productName}
+                      </div>
+                    ))}
+                  </div>
+                </td>
+                <td className="px-6 py-4 whitespace-nowrap">
+                  <Badge variant="status" status={order.status.toLowerCase()}>
+                    {order.status}
+                  </Badge>
+                </td>
+                <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+                  {formatDate('orderDate' in order ? order.orderDate : new Date())}
+                </td>
+                <td className="px-6 py-4 whitespace-nowrap">
+                  <div className="text-sm font-medium text-gray-900">
+                    {formatCurrency(order.total)}
+                  </div>
+                  <div className="text-sm text-gray-500">
+                    {order.paid ? '✓ Paid' : '○ Unpaid'}
+                  </div>
+                </td>
+                <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+                  <div className="flex items-center space-x-2">
+                    <button className="text-blue-600 hover:text-blue-900">
+                      <Eye className="h-4 w-4" />
+                    </button>
+                  </div>
+                </td>
+              </tr>
+            ))}
+          </tbody>
+        </table>
+      </div>
+    </div>
+  )
+}
 
 const getPlatformBadge = (platform: string) => {
   const platforms: Record<string, { color: string; name: string }> = {
@@ -242,259 +250,6 @@ const getPlatformBadge = (platform: string) => {
         {platform === 'wix' ? 'W' : platform === 'amazon' ? 'A' : platform.charAt(0).toUpperCase()}
       </div>
       <span className="text-sm text-gray-600">{config.name}</span>
-    </div>
-  )
-}
-
-export default function OrdersPage() {
-  const [activeTab, setActiveTab] = useState('all')
-  const [searchTerm, setSearchTerm] = useState('')
-  const [orders] = useState<Order[]>(mockOrders)
-
-  const filteredOrders = orders.filter(order => {
-    const matchesTab = activeTab === 'all' || order.status === activeTab
-    const matchesSearch = order.orderId.toLowerCase().includes(searchTerm.toLowerCase()) ||
-                         order.customer.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
-                         order.items.some(item => item.productName.toLowerCase().includes(searchTerm.toLowerCase()))
-    return matchesTab && matchesSearch
-  })
-
-  return (
-    <div className="p-6 max-w-7xl mx-auto">
-      {/* Header */}
-      <div className="flex items-center justify-between mb-6">
-        <div>
-          <h1 className="text-2xl font-semibold text-gray-900">Orders</h1>
-          <p className="text-sm text-gray-600 mt-1">
-            Manage orders across all your sales channels
-          </p>
-        </div>
-        <div className="flex items-center space-x-3">
-          <Button variant="outline" size="sm">
-            <Download className="h-4 w-4 mr-2" />
-            Export
-          </Button>
-          <Button variant="outline" size="sm">
-            <Upload className="h-4 w-4 mr-2" />
-            Import
-          </Button>
-          <Button variant="primary" size="sm">
-            <Plus className="h-4 w-4 mr-2" />
-            Create Order
-          </Button>
-        </div>
-      </div>
-
-      {/* Order Status Tabs */}
-      <div className="border-b border-gray-200 mb-6">
-        <nav className="-mb-px flex space-x-8 overflow-x-auto">
-          {orderStatusTabs.map((tab) => (
-            <button
-              key={tab.id}
-              onClick={() => setActiveTab(tab.id)}
-              className={`py-2 px-1 border-b-2 font-medium text-sm whitespace-nowrap ${
-                activeTab === tab.id
-                  ? 'border-blue-500 text-blue-600'
-                  : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300'
-              }`}
-            >
-              {tab.label}
-              {tab.count > 0 && (
-                <span className="ml-2 py-0.5 px-2 rounded-full text-xs bg-gray-100 text-gray-600">
-                  {tab.count}
-                </span>
-              )}
-            </button>
-          ))}
-        </nav>
-      </div>
-
-      {/* Controls */}
-      <div className="flex items-center justify-between mb-6">
-        <div className="flex items-center space-x-4">
-          <Button variant="outline" size="sm">
-            <Filter className="h-4 w-4 mr-2" />
-            Filter
-          </Button>
-          <Button variant="outline" size="sm">
-            <Columns3 className="h-4 w-4 mr-2" />
-            Columns
-          </Button>
-          <Button variant="outline" size="sm">
-            <SortDesc className="h-4 w-4 mr-2" />
-            Sort
-          </Button>
-          <Button variant="outline" size="sm">
-            Reset Width
-          </Button>
-        </div>
-        
-        <div className="flex items-center space-x-4">
-          <span className="text-sm text-gray-600">
-            Total Items: <span className="font-medium">{filteredOrders.length}</span>
-          </span>
-          <div className="flex items-center space-x-2">
-            <Button variant="ghost" size="sm">
-              <Printer className="h-4 w-4 mr-2" />
-              Print
-            </Button>
-            <Button variant="ghost" size="sm">
-              <Mail className="h-4 w-4 mr-2" />
-              Email
-            </Button>
-            <Button variant="ghost" size="sm">
-              Change Status
-            </Button>
-          </div>
-        </div>
-      </div>
-
-      {/* Search */}
-      <div className="mb-6">
-        <div className="relative max-w-md">
-          <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-gray-400" />
-          <input
-            type="text"
-            placeholder="Search by order, customer or shipping destination"
-            value={searchTerm}
-            onChange={(e) => setSearchTerm(e.target.value)}
-            className="w-full pl-10 pr-4 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
-          />
-        </div>
-      </div>
-
-      {/* Orders Table */}
-      <div className="bg-white border border-gray-200 rounded-lg overflow-hidden">
-        <div className="overflow-x-auto">
-          <table className="min-w-full divide-y divide-gray-200">
-            <thead className="bg-gray-50">
-              <tr>
-                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                  <input type="checkbox" className="rounded border-gray-300" />
-                </th>
-                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                  Order
-                </th>
-                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                  Item Name
-                </th>
-                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                  Qty
-                </th>
-                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                  Date
-                </th>
-                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                  Total
-                </th>
-                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                  Paid
-                </th>
-                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                  Status
-                </th>
-                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                  Tracking No.
-                </th>
-                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                  Actions
-                </th>
-              </tr>
-            </thead>
-            <tbody className="bg-white divide-y divide-gray-200">
-              {filteredOrders.map((order, index) => (
-                <tr key={order.id} className={index % 2 === 0 ? 'bg-white' : 'bg-gray-50'}>
-                  <td className="px-6 py-4 whitespace-nowrap">
-                    <input type="checkbox" className="rounded border-gray-300" />
-                  </td>
-                  <td className="px-6 py-4 whitespace-nowrap">
-                    <div className="space-y-1">
-                      {getPlatformBadge(order.platform)}
-                      <div className="text-sm font-medium text-gray-900">
-                        {order.orderId}
-                      </div>
-                      <div className="text-xs text-gray-500">
-                        {formatDate(order.date)}
-                      </div>
-                    </div>
-                  </td>
-                  <td className="px-6 py-4">
-                    <div className="text-sm font-medium text-gray-900 max-w-xs">
-                      {order.items.map((item, idx) => (
-                        <div key={idx}>{item.productName}</div>
-                      ))}
-                    </div>
-                  </td>
-                  <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
-                    {order.items.reduce((sum, item) => sum + item.quantity, 0)}
-                  </td>
-                  <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
-                    {formatDate(order.date)}
-                  </td>
-                  <td className="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">
-                    {formatCurrency(order.total, order.currency)}
-                  </td>
-                  <td className="px-6 py-4 whitespace-nowrap">
-                    {order.paid ? (
-                      <div className="w-5 h-5 bg-green-500 rounded-full flex items-center justify-center">
-                        <span className="text-white text-xs">✓</span>
-                      </div>
-                    ) : (
-                      <div className="w-5 h-5 bg-red-500 rounded-full flex items-center justify-center">
-                        <span className="text-white text-xs">✗</span>
-                      </div>
-                    )}
-                  </td>
-                  <td className="px-6 py-4 whitespace-nowrap">
-                    <Badge variant="status" status={order.status}>
-                      {order.status === 'new' ? 'New' :
-                       order.status === 'in-progress' ? 'In-Progress' :
-                       order.status === 'shipped' ? 'Shipped' :
-                       order.status === 'cancelled' ? 'Cancelled' : 
-                       order.status}
-                    </Badge>
-                  </td>
-                  <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
-                    {order.trackingNumber || '-'}
-                  </td>
-                  <td className="px-6 py-4 whitespace-nowrap">
-                    <div className="flex items-center space-x-2">
-                      <Button variant="ghost" size="sm">
-                        <Eye className="h-4 w-4" />
-                      </Button>
-                      <Button variant="ghost" size="sm">
-                        <MoreHorizontal className="h-4 w-4" />
-                      </Button>
-                    </div>
-                  </td>
-                </tr>
-              ))}
-            </tbody>
-          </table>
-        </div>
-      </div>
-
-      {/* Pagination */}
-      <div className="mt-6 flex items-center justify-between">
-        <div className="flex items-center space-x-2">
-          <span className="text-sm text-gray-700">1</span>
-          <span className="text-sm text-gray-500">/ 1082</span>
-          <div className="flex space-x-1">
-            {[1, 2, 3, 4, 5, 6, 7, 8, 9, 10].map((page) => (
-              <button
-                key={page}
-                className={`px-3 py-1 rounded text-sm ${
-                  page === 1 ? 'bg-blue-500 text-white' : 'text-gray-500 hover:text-gray-700'
-                }`}
-              >
-                {page}
-              </button>
-            ))}
-            <span className="px-3 py-1 text-sm text-gray-500">...</span>
-            <button className="px-3 py-1 rounded text-sm text-gray-500 hover:text-gray-700">10</button>
-          </div>
-        </div>
-      </div>
     </div>
   )
 }

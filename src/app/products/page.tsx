@@ -1,8 +1,8 @@
 'use client'
 
-import { useState } from 'react'
-import { mockBundles } from '@/lib/mockData'
-import { Bundle } from '@/types'
+import { useState, useEffect } from 'react'
+import { getBundledProducts } from '@/lib/database/products'
+import type { ProductWithRelations } from '@/types'
 import Button from '@/components/ui/Button'
 import Badge from '@/components/ui/Badge'
 import { 
@@ -27,23 +27,74 @@ const bundleCategories = [
   { id: 'simple', label: 'Simple', count: 0 }
 ]
 
+interface BundleProduct extends ProductWithRelations {
+  components: {
+    productId: string
+    productName: string
+    sku: string
+    quantityNeeded: number
+    availableStock: number
+  }[]
+  retailPrice: number
+}
+
 export default function ProductsPage() {
   const [activeCategory, setActiveCategory] = useState('bundled')
   const [searchTerm, setSearchTerm] = useState('')
-  const [bundles] = useState<Bundle[]>(mockBundles)
-  const [selectedBundle, setSelectedBundle] = useState<Bundle | null>(null)
+  const [bundles, setBundles] = useState<BundleProduct[]>([])
+  const [loading, setLoading] = useState(true)
+  const [error, setError] = useState<string | null>(null)
+  const [selectedBundle, setSelectedBundle] = useState<BundleProduct | null>(null)
   const [showBundleDetails, setShowBundleDetails] = useState(false)
 
+  useEffect(() => {
+    async function fetchBundles() {
+      try {
+        setLoading(true)
+        const bundleData = await getBundledProducts()
+        setBundles(bundleData as BundleProduct[])
+      } catch (err) {
+        console.error('Error fetching bundles:', err)
+        setError('Failed to load bundle products')
+      } finally {
+        setLoading(false)
+      }
+    }
+
+    fetchBundles()
+  }, [])
+
   const filteredBundles = bundles.filter(bundle => {
-    const matchesCategory = activeCategory === 'all' || bundle.category === activeCategory
+    const matchesCategory = activeCategory === 'all' || bundle.category.toLowerCase() === activeCategory
     const matchesSearch = bundle.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
                          bundle.sku.toLowerCase().includes(searchTerm.toLowerCase())
     return matchesCategory && matchesSearch
   })
 
-  const handleViewBundle = (bundle: Bundle) => {
+  const handleViewBundle = (bundle: BundleProduct) => {
     setSelectedBundle(bundle)
     setShowBundleDetails(true)
+  }
+
+  if (loading) {
+    return (
+      <div className="p-6 max-w-7xl mx-auto">
+        <div className="flex items-center justify-center h-64">
+          <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-500"></div>
+          <span className="ml-2 text-gray-600">Loading bundles...</span>
+        </div>
+      </div>
+    )
+  }
+
+  if (error) {
+    return (
+      <div className="p-6 max-w-7xl mx-auto">
+        <div className="bg-red-50 border border-red-200 rounded-lg p-4">
+          <div className="text-red-800">{error}</div>
+        </div>
+      </div>
+    )
   }
 
   return (
@@ -155,7 +206,7 @@ export default function ProductsPage() {
               </div>
               <div className="text-right">
                 <div className="text-2xl font-bold text-gray-900">
-                  {bundle.warehouse.available}
+                  {bundle.warehouse?.available || 0}
                 </div>
                 <div className="text-sm text-gray-500">Available</div>
                 <div className="text-lg font-semibold text-green-600 mt-1">
@@ -291,7 +342,7 @@ export default function ProductsPage() {
                     </div>
                     <div>
                       <label className="text-sm font-medium text-gray-700">Available Quantity</label>
-                      <div className="text-sm text-gray-900">{selectedBundle.warehouse.available} units</div>
+                      <div className="text-sm text-gray-900">{selectedBundle.warehouse?.available || 0} units</div>
                     </div>
                   </div>
                 </div>

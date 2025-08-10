@@ -1,7 +1,7 @@
-import { Product, Bundle } from '@/types'
+// Legacy mock data file - database integration has replaced most of this
 
-// Mock data matching multiorders screenshots
-export const mockProducts: Product[] = [
+// Mock data matching multiorders screenshots  
+export const mockProducts: any[] = [
   {
     id: '1',
     name: 'A4 Paper',
@@ -176,7 +176,7 @@ export const mockProducts: Product[] = [
 ]
 
 // Multi-channel products (matching advanced screenshot)
-export const multiChannelProducts: Product[] = [
+export const multiChannelProducts: any[] = [
   {
     id: 'mc1',
     name: 'Triple Mango OX Passion Nic Salt',
@@ -242,7 +242,7 @@ export const multiChannelProducts: Product[] = [
 ]
 
 // Bundle components matching the screenshot
-export const mockBundles: Bundle[] = [
+export const mockBundles: any[] = [
   {
     id: 'bundle1',
     name: "Men's Clothing Deal",

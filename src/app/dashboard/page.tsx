@@ -1,42 +1,67 @@
 'use client'
 
+import { useState, useEffect } from 'react'
 import { formatCurrency, formatNumber } from '@/lib/utils'
 import { Download, Calendar, Plus, RefreshCw } from 'lucide-react'
 import Button from '@/components/ui/Button'
 import Badge from '@/components/ui/Badge'
 import { Card, CardHeader, CardContent, CardTitle, CardDescription } from '@/components/ui/Card'
+import { getDashboardMetrics, getSalesByChannel, getOrderStatusBreakdown } from '@/lib/database/dashboard'
+import type { DashboardMetrics } from '@/types'
 
-// Mock data matching multiorders screenshots
-const dashboardMetrics = {
-  newOrders: 1267,
-  sales: 47692.19,
-  totalOrders: 1268,
-  unitsSold: 1576,
-  lowStock: 2094,
-  returnCustomers: 12,
-  returnCustomersPercent: 17.67,
-  newClients: 1137
+interface SalesChannel {
+  platform: string
+  totalSales: number
+  orderCount: number
 }
 
-const orderStatuses = [
-  { status: 'New', count: 61, color: 'bg-blue-500' },
-  { status: 'Prepared', count: 4, color: 'bg-yellow-500' },
-  { status: 'In-Progress', count: 48, color: 'bg-orange-500' },
-  { status: 'Pending', count: 20, color: 'bg-gray-500' },
-  { status: 'Shipped', count: 428, color: 'bg-green-500' },
-]
-
-const salesByChannel = [
-  { name: 'Wix clothing', amount: 12356.04, color: 'bg-blue-500' },
-  { name: 'Wix phone cases', amount: 12304.00, color: 'bg-green-500' },
-  { name: 'eBay', amount: 11444.18, color: 'bg-yellow-500' },
-  { name: 'Amazon US', amount: 10902.24, color: 'bg-red-500' },
-  { name: 'Amazon UK', amount: 10094.04, color: 'bg-purple-500' },
-  { name: 'Shopify clothing', amount: 5379.84, color: 'bg-indigo-500' },
-  { name: 'Etsy', amount: 5231.04, color: 'bg-pink-500' },
-]
-
 export default function DashboardPage() {
+  const [dashboardMetrics, setDashboardMetrics] = useState<DashboardMetrics | null>(null)
+  const [salesByChannel, setSalesByChannel] = useState<SalesChannel[]>([])
+  const [orderStatuses, setOrderStatuses] = useState<{ status: string; count: number; color: string }[]>([])
+  const [loading, setLoading] = useState(true)
+  const [error, setError] = useState<string | null>(null)
+
+  useEffect(() => {
+    async function fetchDashboardData() {
+      try {
+        setLoading(true)
+        const [metrics, channels, statusBreakdown] = await Promise.all([
+          getDashboardMetrics(),
+          getSalesByChannel(),
+          getOrderStatusBreakdown(),
+        ])
+
+        setDashboardMetrics(metrics)
+        setSalesByChannel(channels)
+        
+        // Map status breakdown to display format with colors
+        const statusColors: Record<string, string> = {
+          NEW: 'bg-blue-500',
+          PREPARED: 'bg-yellow-500',
+          IN_PROGRESS: 'bg-orange-500',
+          PENDING: 'bg-gray-500',
+          SHIPPED: 'bg-green-500',
+          CANCELLED: 'bg-red-500',
+        }
+
+        const formattedStatuses = statusBreakdown.map(item => ({
+          status: item.status.replace('_', '-').toLowerCase().replace(/\b\w/g, l => l.toUpperCase()),
+          count: item.count,
+          color: statusColors[item.status] || 'bg-gray-500',
+        }))
+
+        setOrderStatuses(formattedStatuses)
+      } catch (err) {
+        console.error('Error fetching dashboard data:', err)
+        setError('Failed to load dashboard data')
+      } finally {
+        setLoading(false)
+      }
+    }
+
+    fetchDashboardData()
+  }, [])
   const handleTestToast = (type: 'success' | 'error' | 'warning' | 'default') => {
     const messages = {
       success: { title: 'Order Updated!', description: 'Order #1234 has been successfully shipped.' },
@@ -46,6 +71,35 @@ export default function DashboardPage() {
     }
     // For now, just console log instead of using toast
     console.log('Toast would show:', messages[type])
+  }
+
+  if (loading) {
+    return (
+      <div className="p-6 max-w-7xl mx-auto">
+        <div className="flex items-center justify-center h-64">
+          <RefreshCw className="h-8 w-8 animate-spin text-blue-500" />
+          <span className="ml-2 text-gray-600">Loading dashboard...</span>
+        </div>
+      </div>
+    )
+  }
+
+  if (error) {
+    return (
+      <div className="p-6 max-w-7xl mx-auto">
+        <div className="bg-red-50 border border-red-200 rounded-lg p-4">
+          <div className="text-red-800">{error}</div>
+        </div>
+      </div>
+    )
+  }
+
+  if (!dashboardMetrics) {
+    return (
+      <div className="p-6 max-w-7xl mx-auto">
+        <div className="text-center text-gray-500">No dashboard data available</div>
+      </div>
+    )
   }
 
   return (
@@ -143,17 +197,22 @@ export default function DashboardPage() {
           <div className="space-y-3">
             <h4 className="text-sm font-medium text-gray-700">Total Sales Per Channel</h4>
             <div className="grid grid-cols-2 gap-x-4 gap-y-2 text-sm">
-              {salesByChannel.map((channel) => (
-                <div key={channel.name} className="flex items-center justify-between">
-                  <div className="flex items-center space-x-2">
-                    <div className={`w-3 h-3 rounded-sm ${channel.color}`}></div>
-                    <span className="text-gray-600 truncate">{channel.name}</span>
+              {salesByChannel.map((channel, index) => {
+                const colors = ['bg-blue-500', 'bg-green-500', 'bg-yellow-500', 'bg-red-500', 'bg-purple-500', 'bg-indigo-500', 'bg-pink-500']
+                const color = colors[index % colors.length]
+                
+                return (
+                  <div key={channel.platform} className="flex items-center justify-between">
+                    <div className="flex items-center space-x-2">
+                      <div className={`w-3 h-3 rounded-sm ${color}`}></div>
+                      <span className="text-gray-600 truncate">{channel.platform}</span>
+                    </div>
+                    <span className="font-medium text-gray-900">
+                      {formatCurrency(channel.totalSales)}
+                    </span>
                   </div>
-                  <span className="font-medium text-gray-900">
-                    {formatCurrency(channel.amount)}
-                  </span>
-                </div>
-              ))}
+                )
+              })}
             </div>
           </div>
         </div>
@@ -189,7 +248,7 @@ export default function DashboardPage() {
             <div className="bg-white rounded-lg border border-gray-200 p-4 text-center">
               <div className="text-sm text-gray-600">Return Customers</div>
               <div className="text-2xl font-bold text-gray-900">
-                {dashboardMetrics.returnCustomers} ({dashboardMetrics.returnCustomersPercent}%)
+                {dashboardMetrics.returnCustomers} ({dashboardMetrics.returnCustomersPercent || 0}%)
               </div>
             </div>
             <div className="bg-white rounded-lg border border-gray-200 p-4 text-center">

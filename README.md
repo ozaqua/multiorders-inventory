@@ -1,36 +1,193 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# Multiorders Inventory Management System
+
+A comprehensive inventory management system built with Next.js 14, TypeScript, Prisma, and PostgreSQL. This application supports multi-platform e-commerce inventory management across Amazon, eBay, Shopify, Wix, and Etsy.
+
+## Features
+
+- **Dashboard Analytics**: Real-time metrics, sales charts, and order status tracking
+- **Inventory Management**: Product catalog with warehouse stock tracking
+- **Multi-Platform Support**: Integration with major e-commerce platforms
+- **Order Management**: Complete order lifecycle management
+- **Customer Management**: Customer database with order history
+- **Bundle Products**: Support for bundled products with component tracking
+- **Supplier Management**: Track suppliers and purchase information
+- **Real-time Updates**: Live inventory and stock level monitoring
+
+## Tech Stack
+
+- **Frontend**: Next.js 14, TypeScript, Tailwind CSS
+- **Backend**: Prisma ORM, PostgreSQL
+- **Deployment**: Vercel with Vercel Postgres
+- **Icons**: Lucide React
+- **Charts**: Recharts
 
 ## Getting Started
 
-First, run the development server:
+### Prerequisites
 
+- Node.js 18+ and npm
+- PostgreSQL database (local or Vercel Postgres)
+
+### Installation
+
+1. Clone the repository
 ```bash
-npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
+git clone <your-repo-url>
+cd multiorders-inventory
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+2. Install dependencies
+```bash
+npm install
+```
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+3. Set up environment variables
+```bash
+cp .env.example .env
+```
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+Update `.env` with your database connection string:
+```env
+DATABASE_URL="postgresql://username:password@localhost:5432/multiorders_inventory"
+```
 
-## Learn More
+### Database Setup
 
-To learn more about Next.js, take a look at the following resources:
+1. Generate Prisma client
+```bash
+npm run db:generate
+```
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+2. Push schema to database
+```bash
+npm run db:push
+```
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
+3. Seed the database with sample data
+```bash
+npm run db:seed
+```
 
-## Deploy on Vercel
+4. (Optional) Open Prisma Studio to view data
+```bash
+npm run db:studio
+```
 
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
+### Development
 
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+Start the development server:
+```bash
+npm run dev
+```
+
+Open [http://localhost:3000](http://localhost:3000) to view the application.
+
+## Deployment on Vercel
+
+### 1. Create Vercel Postgres Database
+
+1. Go to your Vercel dashboard
+2. Create a new Postgres database
+3. Copy the connection string
+
+### 2. Set Environment Variables
+
+In your Vercel project settings, add:
+```
+DATABASE_URL=<your-vercel-postgres-url>
+```
+
+### 3. Deploy
+
+```bash
+# Deploy to Vercel
+vercel --prod
+
+# Or connect your GitHub repository for automatic deployments
+```
+
+### 4. Run Database Migration
+
+After deployment, you need to set up your database:
+
+```bash
+# Connect to your production database and run
+npx prisma db push
+npx prisma db seed
+```
+
+## Database Schema
+
+The application uses the following main entities:
+
+- **Products**: Core product information with multi-platform pricing
+- **WarehouseStock**: Inventory levels and warehouse locations
+- **Customers**: Customer information with order history
+- **Orders**: Order management with platform integration
+- **Suppliers**: Supplier information and relationships
+- **BundleComponents**: Support for bundled products
+- **PlatformIntegrations**: Platform API connections
+
+## API Routes
+
+The application uses Server Actions and database functions:
+
+- `/lib/database/products.ts` - Product operations
+- `/lib/database/customers.ts` - Customer operations  
+- `/lib/database/orders.ts` - Order operations
+- `/lib/database/dashboard.ts` - Analytics and metrics
+
+## Prisma Commands
+
+```bash
+# Generate Prisma client
+npm run db:generate
+
+# Push schema changes to database
+npm run db:push
+
+# Create and run migrations
+npm run db:migrate
+
+# Seed database with sample data
+npm run db:seed
+
+# Open Prisma Studio
+npm run db:studio
+```
+
+## Environment Variables
+
+```env
+# Database
+DATABASE_URL="postgresql://username:password@localhost:5432/multiorders_inventory"
+
+# Authentication (optional)
+NEXTAUTH_SECRET="your-secret-key"
+NEXTAUTH_URL="http://localhost:3000"
+
+# Platform API Keys (for integrations)
+AMAZON_ACCESS_KEY=""
+AMAZON_SECRET_KEY=""
+EBAY_CLIENT_ID=""
+EBAY_CLIENT_SECRET=""
+SHOPIFY_API_KEY=""
+SHOPIFY_SECRET=""
+WIX_API_KEY=""
+ETSY_API_KEY=""
+
+# Encryption
+ENCRYPTION_KEY="your-32-character-encryption-key"
+```
+
+## Contributing
+
+1. Fork the repository
+2. Create your feature branch (`git checkout -b feature/amazing-feature`)
+3. Commit your changes (`git commit -m 'Add some amazing feature'`)
+4. Push to the branch (`git push origin feature/amazing-feature`)
+5. Open a Pull Request
+
+## License
+
+This project is licensed under the MIT License.
