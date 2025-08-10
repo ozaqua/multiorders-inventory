@@ -21,6 +21,10 @@ export interface ProductWithRelations extends Product {
 // Get all products with warehouse and pricing data
 export async function getAllProducts(): Promise<ProductWithRelations[]> {
   try {
+    // Check if database is available
+    if (!process.env.DATABASE_URL) {
+      throw new Error('DATABASE_URL environment variable is not configured')
+    }
     const products = await prisma.product.findMany({
       include: {
         warehouse: {

@@ -32,7 +32,7 @@ export default function OrdersPage() {
         setOrders(fetchedOrders)
       } catch (err) {
         console.error('Failed to fetch orders:', err)
-        setError('Failed to load orders')
+        setError(`Failed to load orders: ${err instanceof Error ? err.message : 'Unknown error'}`)
         // Use fallback empty data for now
         setOrders([])
       } finally {

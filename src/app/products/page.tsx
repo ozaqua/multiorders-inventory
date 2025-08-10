@@ -59,7 +59,7 @@ export default function ProductsPage() {
         setBundles(bundleData as BundleProduct[])
       } catch (err) {
         console.error('Error fetching bundles:', err)
-        setError('Failed to load bundle products')
+        setError(`Failed to load bundle products: ${err instanceof Error ? err.message : 'Unknown error'}`)
       } finally {
         setLoading(false)
       }

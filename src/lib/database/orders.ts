@@ -34,6 +34,10 @@ export interface OrderWithRelations extends Order {
 // Get all orders with relations
 export async function getAllOrders(): Promise<OrderWithRelations[]> {
   try {
+    // Check if database is available
+    if (!process.env.DATABASE_URL) {
+      throw new Error('DATABASE_URL environment variable is not configured')
+    }
     const orders = await prisma.order.findMany({
       include: {
         customer: {

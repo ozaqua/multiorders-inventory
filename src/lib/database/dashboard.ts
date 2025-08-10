@@ -24,6 +24,10 @@ export interface SalesData {
 // Get comprehensive dashboard metrics
 export async function getDashboardMetrics(): Promise<DashboardMetrics> {
   try {
+    // Check if database is available
+    if (!process.env.DATABASE_URL) {
+      throw new Error('DATABASE_URL environment variable is not configured')
+    }
     const [orderStats, customerStats, lowStockProducts] = await Promise.all([
       getOrderStats(),
       getCustomerStats(),

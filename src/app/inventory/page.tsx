@@ -61,7 +61,7 @@ export default function InventoryPage() {
         setProducts(productsData)
       } catch (err) {
         console.error('Error fetching products:', err)
-        setError('Failed to load products')
+        setError(`Failed to load products: ${err instanceof Error ? err.message : 'Unknown error'}`)
       } finally {
         setLoading(false)
       }

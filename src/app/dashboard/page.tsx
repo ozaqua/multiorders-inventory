@@ -58,7 +58,7 @@ export default function DashboardPage() {
         setOrderStatuses(formattedStatuses)
       } catch (err) {
         console.error('Error fetching dashboard data:', err)
-        setError('Failed to load dashboard data')
+        setError(`Failed to load dashboard data: ${err instanceof Error ? err.message : 'Unknown error'}`)
       } finally {
         setLoading(false)
       }
