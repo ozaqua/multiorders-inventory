@@ -34,6 +34,22 @@ UPDATE: All deployment errors have been FIXED! ✅
 - All 5 pre-render errors resolved (dashboard, orders, inventory, products, customers)
 
 **Status:** ✅ READY FOR DEPLOYMENT - All Vercel deployment issues resolved
+
+## ⚠️ **IMPORTANT: Localhost Connectivity Issues**
+
+**Known Issue:** This development environment has persistent localhost connectivity problems that prevent connecting to local services on any port (tested ports 3000, 4000, 5000, 8080, 9000). This affects:
+- Local development servers
+- Local database connections (PostgreSQL on localhost:5432)
+- Any localhost-based services
+
+**Root Cause:** Unknown - persists even with direct ISP connection (bypassing UniFi router)
+
+**Workaround:** Always use cloud-based services:
+- ✅ **Database:** Use Neon/Supabase instead of local PostgreSQL
+- ✅ **Development:** Use Vercel deployments for testing
+- ✅ **Local .env:** Point DATABASE_URL to cloud database, not localhost
+
+**Impact:** Must configure all services to use remote connections rather than localhost.
 ```
 
 ## 🛠 Development Commands
