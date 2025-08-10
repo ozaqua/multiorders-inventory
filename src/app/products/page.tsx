@@ -1,6 +1,7 @@
 'use client'
 
 import { useState, useEffect } from 'react'
+
 import { getBundledProducts } from '@/lib/database/products'
 import type { ProductWithRelations } from '@/types'
 import Button from '@/components/ui/Button'
@@ -37,6 +38,9 @@ interface BundleProduct extends ProductWithRelations {
   }[]
   retailPrice: number
 }
+
+// Force this page to be dynamic to prevent pre-render errors
+export const dynamic = 'force-dynamic'
 
 export default function ProductsPage() {
   const [activeCategory, setActiveCategory] = useState('bundled')

@@ -1,6 +1,7 @@
 'use client'
 
 import { useState, useEffect } from 'react'
+
 import { getAllProducts, getProductsByCategory } from '@/lib/database/products'
 import type { ProductWithRelations, ProductCategory } from '@/types'
 import Button from '@/components/ui/Button'
@@ -34,6 +35,9 @@ const platforms = [
   { name: 'wix', color: 'bg-purple-500', textColor: 'text-white' },
   { name: 'etsy', color: 'bg-orange-600', textColor: 'text-white' }
 ]
+
+// Force this page to be dynamic to prevent pre-render errors
+export const dynamic = 'force-dynamic'
 
 export default function InventoryPage() {
   const [activeCategory, setActiveCategory] = useState('all')

@@ -1,6 +1,7 @@
 'use client'
 
 import { useState, useEffect } from 'react'
+
 import type { OrderWithRelations } from '@/lib/database/orders'
 import { getAllOrders } from '@/lib/database/orders'
 import Button from '@/components/ui/Button'
@@ -12,6 +13,9 @@ import {
   Eye
 } from 'lucide-react'
 import { formatCurrency, formatDate, cn } from '@/lib/utils'
+
+// Force this page to be dynamic to prevent pre-render errors
+export const dynamic = 'force-dynamic'
 
 export default function OrdersPage() {
   const [orders, setOrders] = useState<OrderWithRelations[]>([])

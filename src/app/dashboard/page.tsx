@@ -1,6 +1,7 @@
 'use client'
 
 import { useState, useEffect } from 'react'
+
 import { formatCurrency, formatNumber } from '@/lib/utils'
 import { Download, Calendar, Plus, RefreshCw } from 'lucide-react'
 import Button from '@/components/ui/Button'
@@ -14,6 +15,9 @@ interface SalesChannel {
   totalSales: number
   orderCount: number
 }
+
+// Force this page to be dynamic to prevent pre-render errors
+export const dynamic = 'force-dynamic'
 
 export default function DashboardPage() {
   const [dashboardMetrics, setDashboardMetrics] = useState<DashboardMetrics | null>(null)

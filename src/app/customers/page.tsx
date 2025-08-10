@@ -1,6 +1,7 @@
 'use client'
 
 import { useState } from 'react'
+
 import Button from '@/components/ui/Button'
 import Badge from '@/components/ui/Badge'
 import { 
@@ -159,6 +160,9 @@ const getPlatformBadge = (platform: string) => {
     </div>
   )
 }
+
+// Force this page to be dynamic to prevent pre-render errors
+export const dynamic = 'force-dynamic'
 
 export default function CustomersPage() {
   const [searchTerm, setSearchTerm] = useState('')
