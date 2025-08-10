@@ -32,7 +32,7 @@ export interface CustomerInput {
 export interface OrderInput {
   orderId: string
   customerId: string
-  platform: 'AMAZON' | 'EBAY' | 'SHOPIFY' | 'WIX' | 'ETSY'
+  platform: 'EBAY' | 'SHOPIFY' | 'ETSY'
   total: number
   currency?: string
   paid?: boolean
@@ -154,8 +154,8 @@ export function validateOrder(data: any): OrderInput {
     errors.push('Customer ID is required')
   }
 
-  if (!data.platform || !['AMAZON', 'EBAY', 'SHOPIFY', 'WIX', 'ETSY'].includes(data.platform)) {
-    errors.push('Platform must be one of: AMAZON, EBAY, SHOPIFY, WIX, ETSY')
+  if (!data.platform || !['EBAY', 'SHOPIFY', 'ETSY'].includes(data.platform)) {
+    errors.push('Platform must be one of: EBAY, SHOPIFY, ETSY')
   }
 
   if (typeof data.total !== 'number' || data.total < 0) {

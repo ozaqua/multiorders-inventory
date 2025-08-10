@@ -68,7 +68,7 @@ export default function OrdersPage() {
     updatedAt: new Date('2025-12-02T17:41:00'),
     orderId: '10086',
     customerId: '1',
-    platform: 'WIX',
+    platform: 'SHOPIFY',
     status: 'NEW',
     total: 78.00,
     currency: 'USD',
@@ -235,19 +235,18 @@ export default function OrdersPage() {
 
 const getPlatformBadge = (platform: string) => {
   const platforms: Record<string, { color: string; name: string }> = {
-    wix: { color: 'bg-purple-500', name: 'Wix' },
-    amazon: { color: 'bg-orange-500', name: 'Amazon' },
     ebay: { color: 'bg-blue-500', name: 'eBay' },
     shopify: { color: 'bg-green-500', name: 'Shopify' },
-    etsy: { color: 'bg-orange-600', name: 'Etsy' }
+    etsy: { color: 'bg-orange-600', name: 'Etsy' },
+    multiorders: { color: 'bg-gray-600', name: 'Internal' }
   }
   
-  const config = platforms[platform] || { color: 'bg-gray-500', name: platform }
+  const config = platforms[platform.toLowerCase()] || { color: 'bg-gray-500', name: platform }
   
   return (
     <div className="flex items-center space-x-2">
       <div className={`w-6 h-6 rounded flex items-center justify-center ${config.color} text-white text-xs font-bold`}>
-        {platform === 'wix' ? 'W' : platform === 'amazon' ? 'A' : platform.charAt(0).toUpperCase()}
+        {platform.charAt(0).toUpperCase()}
       </div>
       <span className="text-sm text-gray-600">{config.name}</span>
     </div>

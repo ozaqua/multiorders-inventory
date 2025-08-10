@@ -71,8 +71,8 @@ async function main() {
         },
         platforms: {
           create: [
-            { platform: 'WIX' },
-            { platform: 'AMAZON' },
+            { platform: 'SHOPIFY' },
+            { platform: 'ETSY' },
           ],
         },
       },
@@ -133,7 +133,7 @@ async function main() {
         },
         platforms: {
           create: [
-            { platform: 'AMAZON' },
+            { platform: 'EBAY' },
           ],
         },
       },
@@ -164,7 +164,7 @@ async function main() {
         },
         platforms: {
           create: [
-            { platform: 'WIX' },
+            { platform: 'SHOPIFY' },
             { platform: 'ETSY' },
           ],
         },
@@ -226,7 +226,7 @@ async function main() {
         prices: {
           create: [
             { platform: 'MULTIORDERS', price: 12.99 },
-            { platform: 'AMAZON', price: 14.99 },
+            { platform: 'EBAY', price: 14.99 },
           ],
         },
       },
@@ -278,7 +278,7 @@ async function main() {
         prices: {
           create: [
             { platform: 'MULTIORDERS', price: 15.99 },
-            { platform: 'AMAZON', price: 17.99 },
+            { platform: 'EBAY', price: 17.99 },
             { platform: 'SHOPIFY', price: 16.99 },
           ],
         },
@@ -330,7 +330,7 @@ async function main() {
         prices: {
           create: [
             { platform: 'MULTIORDERS', price: 18.99 },
-            { platform: 'WIX', price: 19.99 },
+            { platform: 'SHOPIFY', price: 19.99 },
           ],
         },
       },
@@ -356,7 +356,7 @@ async function main() {
         prices: {
           create: [
             { platform: 'MULTIORDERS', price: 79.99 },
-            { platform: 'AMAZON', price: 84.99 },
+            { platform: 'EBAY', price: 84.99 },
           ],
         },
       },
@@ -411,7 +411,7 @@ async function main() {
         },
         prices: {
           create: [
-            { platform: 'WIX', price: 14.75 },
+            { platform: 'SHOPIFY', price: 14.75 },
           ],
         },
       },
@@ -436,7 +436,7 @@ async function main() {
         },
         prices: {
           create: [
-            { platform: 'WIX', price: 27.25 },
+            { platform: 'SHOPIFY', price: 27.25 },
             { platform: 'EBAY', price: 27.25 },
           ],
         },
@@ -461,7 +461,7 @@ async function main() {
         },
         prices: {
           create: [
-            { platform: 'WIX', price: 24.25 },
+            { platform: 'SHOPIFY', price: 24.25 },
           ],
         },
       },
@@ -490,7 +490,7 @@ async function main() {
         },
         prices: {
           create: [
-            { platform: 'AMAZON', price: 29.99 },
+            { platform: 'EBAY', price: 29.99 },
           ],
         },
       },
@@ -513,7 +513,7 @@ async function main() {
         },
         prices: {
           create: [
-            { platform: 'AMAZON', price: 12.99 },
+            { platform: 'EBAY', price: 12.99 },
           ],
         },
       },
@@ -536,7 +536,7 @@ async function main() {
         },
         prices: {
           create: [
-            { platform: 'AMAZON', price: 49.99 },
+            { platform: 'EBAY', price: 49.99 },
           ],
         },
       },
@@ -565,7 +565,7 @@ async function main() {
       },
       prices: {
         create: [
-          { platform: 'AMAZON', price: 136.48 },
+          { platform: 'EBAY', price: 136.48 },
         ],
       },
     },
@@ -604,7 +604,7 @@ async function main() {
       data: {
         orderId: '10086',
         customerId: customers[0].id, // Tom Jackson
-        platform: 'WIX',
+        platform: 'SHOPIFY',
         status: 'NEW',
         total: 78.00,
         currency: 'USD',
@@ -635,7 +635,7 @@ async function main() {
       data: {
         orderId: '156845',
         customerId: customers[1].id, // Sarah Mitchell
-        platform: 'WIX',
+        platform: 'SHOPIFY',
         status: 'NEW',
         total: 176.00,
         currency: 'USD',
@@ -666,7 +666,7 @@ async function main() {
       data: {
         orderId: '111-1481331-2363411',
         customerId: customers[2].id, // Michael Rodriguez
-        platform: 'AMAZON',
+        platform: 'EBAY',
         status: 'IN_PROGRESS',
         total: 107.51,
         currency: 'USD',
@@ -697,7 +697,7 @@ async function main() {
       data: {
         orderId: '112-1475613-0439468',
         customerId: customers[3].id, // Emily Chen
-        platform: 'AMAZON',
+        platform: 'EBAY',
         status: 'SHIPPED',
         total: 135.31,
         currency: 'USD',
@@ -733,7 +733,7 @@ async function main() {
   const integrations = await Promise.all([
     prisma.platformIntegration.create({
       data: {
-        platform: 'AMAZON',
+        platform: 'EBAY',
         status: 'LIVE',
         region: 'US',
         syncEnabled: true,
@@ -760,7 +760,7 @@ async function main() {
     }),
     prisma.platformIntegration.create({
       data: {
-        platform: 'WIX',
+        platform: 'SHOPIFY',
         status: 'LIVE',
         syncEnabled: true,
         productCount: 67,
