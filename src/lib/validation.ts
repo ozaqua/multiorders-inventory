@@ -46,30 +46,31 @@ export interface OrderInput {
 }
 
 // Validation functions
-export function validateProduct(data: any): ProductInput {
+export function validateProduct(data: unknown): ProductInput {
   const errors: string[] = []
+  const input = data as Record<string, unknown>
 
-  if (!data.name || typeof data.name !== 'string' || data.name.trim().length === 0) {
+  if (!input.name || typeof input.name !== 'string' || input.name.trim().length === 0) {
     errors.push('Product name is required and must be a non-empty string')
   }
 
-  if (!data.sku || typeof data.sku !== 'string' || data.sku.trim().length === 0) {
+  if (!input.sku || typeof input.sku !== 'string' || input.sku.trim().length === 0) {
     errors.push('SKU is required and must be a non-empty string')
   }
 
-  if (!data.category || !['SIMPLE', 'CONFIGURABLE', 'MERGED', 'BUNDLED'].includes(data.category)) {
+  if (!input.category || !['SIMPLE', 'CONFIGURABLE', 'MERGED', 'BUNDLED'].includes(input.category as string)) {
     errors.push('Category must be one of: SIMPLE, CONFIGURABLE, MERGED, BUNDLED')
   }
 
-  if (data.reorderPoint !== undefined && (typeof data.reorderPoint !== 'number' || data.reorderPoint < 0)) {
+  if (input.reorderPoint !== undefined && (typeof input.reorderPoint !== 'number' || input.reorderPoint < 0)) {
     errors.push('Reorder point must be a non-negative number')
   }
 
-  if (data.weight !== undefined && (typeof data.weight !== 'number' || data.weight < 0)) {
+  if (input.weight !== undefined && (typeof input.weight !== 'number' || input.weight < 0)) {
     errors.push('Weight must be a non-negative number')
   }
 
-  if (data.buyPrice !== undefined && (typeof data.buyPrice !== 'number' || data.buyPrice < 0)) {
+  if (input.buyPrice !== undefined && (typeof input.buyPrice !== 'number' || input.buyPrice < 0)) {
     errors.push('Buy price must be a non-negative number')
   }
 
@@ -78,49 +79,50 @@ export function validateProduct(data: any): ProductInput {
   }
 
   return {
-    name: data.name.trim(),
-    sku: data.sku.trim().toUpperCase(),
-    category: data.category,
-    description: data.description?.trim(),
-    reorderPoint: data.reorderPoint,
-    tag: data.tag?.trim(),
-    asin: data.asin?.trim(),
-    weight: data.weight,
-    weightUnit: data.weightUnit || 'kg',
-    supplierId: data.supplierId,
-    buyPrice: data.buyPrice,
+    name: (input.name as string).trim(),
+    sku: (input.sku as string).trim().toUpperCase(),
+    category: input.category as 'SIMPLE' | 'CONFIGURABLE' | 'MERGED' | 'BUNDLED',
+    description: (input.description as string)?.trim(),
+    reorderPoint: input.reorderPoint as number | undefined,
+    tag: (input.tag as string)?.trim(),
+    asin: (input.asin as string)?.trim(),
+    weight: input.weight as number | undefined,
+    weightUnit: (input.weightUnit as string) || 'kg',
+    supplierId: input.supplierId as string | undefined,
+    buyPrice: input.buyPrice as number | undefined,
   }
 }
 
-export function validateCustomer(data: any): CustomerInput {
+export function validateCustomer(data: unknown): CustomerInput {
   const errors: string[] = []
+  const input = data as Record<string, any> // eslint-disable-line @typescript-eslint/no-explicit-any
 
-  if (!data.name || typeof data.name !== 'string' || data.name.trim().length === 0) {
+  if (!input.name || typeof input.name !== 'string' || input.name.trim().length === 0) {
     errors.push('Customer name is required and must be a non-empty string')
   }
 
-  if (!data.email || typeof data.email !== 'string' || !isValidEmail(data.email)) {
+  if (!input.email || typeof input.email !== 'string' || !isValidEmail(input.email)) {
     errors.push('Valid email address is required')
   }
 
-  if (data.phone && (typeof data.phone !== 'string' || data.phone.trim().length === 0)) {
+  if (input.phone && (typeof input.phone !== 'string' || input.phone.trim().length === 0)) {
     errors.push('Phone must be a non-empty string if provided')
   }
 
-  if (data.address) {
-    if (!data.address.street || typeof data.address.street !== 'string') {
+  if (input.address) {
+    if (!input.address.street || typeof input.address.street !== 'string') {
       errors.push('Address street is required')
     }
-    if (!data.address.city || typeof data.address.city !== 'string') {
+    if (!input.address.city || typeof input.address.city !== 'string') {
       errors.push('Address city is required')
     }
-    if (!data.address.state || typeof data.address.state !== 'string') {
+    if (!input.address.state || typeof input.address.state !== 'string') {
       errors.push('Address state is required')
     }
-    if (!data.address.zip || typeof data.address.zip !== 'string') {
+    if (!input.address.zip || typeof input.address.zip !== 'string') {
       errors.push('Address zip is required')
     }
-    if (!data.address.country || typeof data.address.country !== 'string') {
+    if (!input.address.country || typeof input.address.country !== 'string') {
       errors.push('Address country is required')
     }
   }
@@ -130,42 +132,43 @@ export function validateCustomer(data: any): CustomerInput {
   }
 
   return {
-    name: data.name.trim(),
-    email: data.email.trim().toLowerCase(),
-    phone: data.phone?.trim(),
-    address: data.address ? {
-      street: data.address.street.trim(),
-      city: data.address.city.trim(),
-      state: data.address.state.trim(),
-      zip: data.address.zip.trim(),
-      country: data.address.country.trim(),
+    name: input.name.trim(),
+    email: input.email.trim().toLowerCase(),
+    phone: input.phone?.trim(),
+    address: input.address ? {
+      street: input.address.street.trim(),
+      city: input.address.city.trim(),
+      state: input.address.state.trim(),
+      zip: input.address.zip.trim(),
+      country: input.address.country.trim(),
     } : undefined,
   }
 }
 
-export function validateOrder(data: any): OrderInput {
+export function validateOrder(data: unknown): OrderInput {
   const errors: string[] = []
+  const input = data as Record<string, any> // eslint-disable-line @typescript-eslint/no-explicit-any
 
-  if (!data.orderId || typeof data.orderId !== 'string' || data.orderId.trim().length === 0) {
+  if (!input.orderId || typeof input.orderId !== 'string' || input.orderId.trim().length === 0) {
     errors.push('Order ID is required and must be a non-empty string')
   }
 
-  if (!data.customerId || typeof data.customerId !== 'string') {
+  if (!input.customerId || typeof input.customerId !== 'string') {
     errors.push('Customer ID is required')
   }
 
-  if (!data.platform || !['EBAY', 'SHOPIFY', 'ETSY'].includes(data.platform)) {
+  if (!input.platform || !['EBAY', 'SHOPIFY', 'ETSY'].includes(input.platform)) {
     errors.push('Platform must be one of: EBAY, SHOPIFY, ETSY')
   }
 
-  if (typeof data.total !== 'number' || data.total < 0) {
+  if (typeof input.total !== 'number' || input.total < 0) {
     errors.push('Total must be a non-negative number')
   }
 
-  if (!Array.isArray(data.items) || data.items.length === 0) {
+  if (!Array.isArray(input.items) || input.items.length === 0) {
     errors.push('Order must have at least one item')
   } else {
-    data.items.forEach((item: any, index: number) => {
+    input.items.forEach((item: any, index: number) => { // eslint-disable-line @typescript-eslint/no-explicit-any
       if (!item.productName || typeof item.productName !== 'string') {
         errors.push(`Item ${index + 1}: Product name is required`)
       }
@@ -183,13 +186,13 @@ export function validateOrder(data: any): OrderInput {
   }
 
   return {
-    orderId: data.orderId.trim(),
-    customerId: data.customerId,
-    platform: data.platform,
-    total: data.total,
-    currency: data.currency || 'USD',
-    paid: data.paid || false,
-    items: data.items.map((item: any) => ({
+    orderId: input.orderId.trim(),
+    customerId: input.customerId,
+    platform: input.platform,
+    total: input.total,
+    currency: input.currency || 'USD',
+    paid: input.paid || false,
+    items: input.items.map((item: any) => ({ // eslint-disable-line @typescript-eslint/no-explicit-any
       productId: item.productId,
       productName: item.productName.trim(),
       sku: item.sku?.trim(),

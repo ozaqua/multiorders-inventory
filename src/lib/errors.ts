@@ -72,7 +72,7 @@ export function handleError(error: unknown, context: string = 'Operation'): AppE
 }
 
 // Async error wrapper
-export function asyncHandler<T extends any[], R>(
+export function asyncHandler<T extends unknown[], R>(
   fn: (...args: T) => Promise<R>
 ) {
   return async (...args: T): Promise<R> => {

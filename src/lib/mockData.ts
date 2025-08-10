@@ -1,7 +1,7 @@
 // Legacy mock data file - database integration has replaced most of this
 
 // Mock data matching multiorders screenshots  
-export const mockProducts: any[] = [
+export const mockProducts: Record<string, unknown>[] = [
   {
     id: '1',
     name: 'A4 Paper',
@@ -176,7 +176,7 @@ export const mockProducts: any[] = [
 ]
 
 // Multi-channel products (matching advanced screenshot)
-export const multiChannelProducts: any[] = [
+export const multiChannelProducts: Record<string, unknown>[] = [
   {
     id: 'mc1',
     name: 'Triple Mango OX Passion Nic Salt',
@@ -242,7 +242,7 @@ export const multiChannelProducts: any[] = [
 ]
 
 // Bundle components matching the screenshot
-export const mockBundles: any[] = [
+export const mockBundles: Record<string, unknown>[] = [
   {
     id: 'bundle1',
     name: "Men's Clothing Deal",

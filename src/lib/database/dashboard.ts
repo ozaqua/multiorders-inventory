@@ -77,7 +77,7 @@ export async function getSalesChartData(days: number = 30): Promise<SalesData[]>
     const startDate = new Date()
     startDate.setDate(startDate.getDate() - days)
 
-    const salesData = await prisma.$queryRaw<any[]>`
+    const salesData = await prisma.$queryRaw<Record<string, unknown>[]>`
       SELECT 
         DATE(order_date) as date,
         platform,
@@ -89,14 +89,14 @@ export async function getSalesChartData(days: number = 30): Promise<SalesData[]>
     `
 
     // Transform the data to the expected format
-    const chartData = salesData.reduce((acc: Record<string, any>, row: any) => {
-      const dateStr = row.date.toISOString().split('T')[0] // YYYY-MM-DD format
+    const chartData = salesData.reduce((acc: Record<string, Record<string, unknown>>, row: Record<string, unknown>) => {
+      const dateStr = (row.date as Date).toISOString().split('T')[0] // YYYY-MM-DD format
       
       if (!acc[dateStr]) {
         acc[dateStr] = { date: dateStr }
       }
       
-      acc[dateStr][row.platform.toLowerCase()] = Number(row.total)
+      acc[dateStr][(row.platform as string).toLowerCase()] = Number(row.total)
       
       return acc
     }, {})
