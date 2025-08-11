@@ -7,10 +7,11 @@ const prisma = new PrismaClient()
 async function main() {
   console.log('🌱 Starting database seeding...')
 
-  // Create platform integrations first (needed for customer platform associations)
+  // Create/update platform integrations first (needed for customer platform associations)
   const integrations = await Promise.all([
-    prisma.platformIntegration.create({
-      data: {
+    prisma.platformIntegration.upsert({
+      where: { platform: 'EBAY' },
+      create: {
         platform: 'EBAY',
         status: 'LIVE',
         region: 'US',
@@ -18,26 +19,30 @@ async function main() {
         productCount: 145,
         lastSync: new Date(),
       },
+      update: {
+        status: 'LIVE',
+        syncEnabled: true,
+        productCount: 145,
+        lastSync: new Date(),
+      },
     }),
-    prisma.platformIntegration.create({
-      data: {
+    prisma.platformIntegration.upsert({
+      where: { platform: 'SHOPIFY' },
+      create: {
         platform: 'SHOPIFY',
         status: 'LIVE',
         syncEnabled: true,
         productCount: 67,
         lastSync: new Date(),
       },
-    }),
-    prisma.platformIntegration.create({
-      data: {
-        platform: 'ETSY',
-        status: 'ERRORED',
-        syncEnabled: false,
-        productCount: 23,
-        lastError: 'API authentication failed',
-        errorCount: 3,
+      update: {
+        status: 'LIVE',
+        syncEnabled: true,
+        productCount: 67,
+        lastSync: new Date(),
       },
     }),
+    // Remove ETSY for now due to authentication issues
   ])
 
   console.log(`✅ Created ${integrations.length} platform integrations`)
@@ -107,7 +112,6 @@ async function main() {
         platforms: {
           create: [
             { platform: 'SHOPIFY' },
-            { platform: 'ETSY' },
           ],
         },
       },
@@ -200,7 +204,6 @@ async function main() {
         platforms: {
           create: [
             { platform: 'SHOPIFY' },
-            { platform: 'ETSY' },
           ],
         },
       },
@@ -764,6 +767,79 @@ async function main() {
 
   console.log(`✅ Created ${orders.length} orders`)
 
+  // Create platform products (links products to platforms)
+  const platformProducts = await Promise.all([
+    // Link some products to EBAY
+    prisma.platformProduct.create({
+      data: {
+        productId: simpleProducts[0].id, // A4 Paper
+        platform: 'EBAY',
+        platformSku: 'EBAY-VAR-PROD-1',
+        listingUrl: 'https://ebay.com/itm/a4-paper-001',
+        isActive: true,
+      },
+    }),
+    prisma.platformProduct.create({
+      data: {
+        productId: simpleProducts[2].id, // Screen Shine Wipes
+        platform: 'EBAY',
+        platformSku: 'EBAY-V1R-850D-2',
+        listingUrl: 'https://ebay.com/itm/screen-wipes-002',
+        isActive: true,
+      },
+    }),
+    // Link some products to SHOPIFY
+    prisma.platformProduct.create({
+      data: {
+        productId: configurableProducts[0].id, // Triple Mango OX
+        platform: 'SHOPIFY',
+        platformSku: 'SHOP-OXVA-001',
+        listingUrl: 'https://mystore.myshopify.com/products/mango-ox',
+        isActive: true,
+      },
+    }),
+  ])
+
+  console.log(`✅ Created ${platformProducts.length} platform product links`)
+
+  // Create dashboard metrics
+  const dashboardMetrics = await Promise.all([
+    prisma.dashboardMetric.create({
+      data: {
+        metric: 'TOTAL_REVENUE',
+        value: 93347.37,
+        period: 'ALL_TIME',
+        date: new Date(),
+      },
+    }),
+    prisma.dashboardMetric.create({
+      data: {
+        metric: 'TOTAL_ORDERS',
+        value: 1247,
+        period: 'ALL_TIME', 
+        date: new Date(),
+      },
+    }),
+    prisma.dashboardMetric.create({
+      data: {
+        metric: 'ACTIVE_CUSTOMERS',
+        value: 438,
+        period: 'ALL_TIME',
+        date: new Date(),
+      },
+    }),
+    prisma.dashboardMetric.create({
+      data: {
+        metric: 'LOW_STOCK_ALERTS',
+        value: 12,
+        period: 'CURRENT',
+        date: new Date(),
+      },
+    }),
+  ])
+
+  console.log(`✅ Created ${dashboardMetrics.length} dashboard metrics`)
+
   console.log('🎉 Database seeding completed successfully!')
   console.log('\nSummary:')
   console.log(`- ${suppliers.length} suppliers`)
@@ -771,6 +847,8 @@ async function main() {
   console.log(`- ${simpleProducts.length + configurableProducts.length + componentProducts.length + 1} products`)
   console.log(`- ${orders.length} orders`)
   console.log(`- ${integrations.length} platform integrations`)
+  console.log(`- ${platformProducts.length} platform product links`)
+  console.log(`- ${dashboardMetrics.length} dashboard metrics`)
 }
 
 main()
