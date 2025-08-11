@@ -73,9 +73,9 @@ export default function Sidebar() {
       <div className="flex h-16 items-center px-6 border-b border-gray-200">
         <div className="flex items-center space-x-2">
           <div className="h-8 w-8 bg-blue-600 rounded-lg flex items-center justify-center">
-            <span className="text-white font-bold text-sm">m</span>
+            <span className="text-white font-bold text-sm">I+</span>
           </div>
-          <span className="text-xl font-semibold text-blue-600">multiorders</span>
+          <span className="text-xl font-semibold text-blue-600">INVENTREE PLUS</span>
         </div>
       </div>
 
