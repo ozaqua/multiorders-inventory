@@ -47,10 +47,11 @@ async function main() {
 
   console.log(`✅ Created ${integrations.length} platform integrations`)
 
-  // Create suppliers
+  // Create/update suppliers
   const suppliers = await Promise.all([
-    prisma.supplier.create({
-      data: {
+    prisma.supplier.upsert({
+      where: { email: 'orders@calypso-co.com' },
+      create: {
         name: 'Calypso Co.',
         email: 'orders@calypso-co.com',
         phone: '+1-555-0123',
@@ -58,9 +59,17 @@ async function main() {
         isActive: true,
         notes: 'Primary clothing and accessories supplier',
       },
+      update: {
+        name: 'Calypso Co.',
+        phone: '+1-555-0123',
+        address: '123 Supplier St, Business City, BC 12345',
+        isActive: true,
+        notes: 'Primary clothing and accessories supplier',
+      },
     }),
-    prisma.supplier.create({
-      data: {
+    prisma.supplier.upsert({
+      where: { email: 'sales@techparts.com' },
+      create: {
         name: 'TechParts Ltd',
         email: 'sales@techparts.com',
         phone: '+1-555-0456',
@@ -68,11 +77,26 @@ async function main() {
         isActive: true,
         notes: 'Electronics and gadgets supplier',
       },
+      update: {
+        name: 'TechParts Ltd',
+        phone: '+1-555-0456',
+        address: '456 Tech Ave, Electronics City, EC 67890',
+        isActive: true,
+        notes: 'Electronics and gadgets supplier',
+      },
     }),
-    prisma.supplier.create({
-      data: {
+    prisma.supplier.upsert({
+      where: { email: 'info@office-essentials.com' },
+      create: {
         name: 'Office Essentials Inc',
         email: 'info@office-essentials.com',
+        phone: '+1-555-0789',
+        address: '789 Office Blvd, Business Park, BP 54321',
+        isActive: true,
+        notes: 'Office supplies and stationery',
+      },
+      update: {
+        name: 'Office Essentials Inc',
         phone: '+1-555-0789',
         address: '789 Office Blvd, Business Park, BP 54321',
         isActive: true,
@@ -286,8 +310,9 @@ async function main() {
 
   // Create simple products
   const simpleProducts = await Promise.all([
-    prisma.product.create({
-      data: {
+    prisma.product.upsert({
+      where: { sku: 'VAR-PROD-1' },
+      create: {
         name: 'A4 Paper',
         sku: 'VAR-PROD-1',
         category: 'SIMPLE',
@@ -311,9 +336,18 @@ async function main() {
           ],
         },
       },
+      update: {
+        name: 'A4 Paper',
+        category: 'SIMPLE',
+        status: 'ACTIVE',
+        reorderPoint: 0,
+        tag: 'M',
+        supplierId: suppliers[2].id,
+      },
     }),
-    prisma.product.create({
-      data: {
+    prisma.product.upsert({
+      where: { sku: 'KS-Z458-MA' },
+      create: {
         name: 'Pencil Box Blue Type',
         sku: 'KS-Z458-MA',
         category: 'SIMPLE',
@@ -337,9 +371,18 @@ async function main() {
           ],
         },
       },
+      update: {
+        name: 'Pencil Box Blue Type',
+        category: 'SIMPLE',
+        status: 'ACTIVE',
+        reorderPoint: 0,
+        tag: 'M',
+        supplierId: suppliers[2].id,
+      },
     }),
-    prisma.product.create({
-      data: {
+    prisma.product.upsert({
+      where: { sku: 'V1R-850D-2' },
+      create: {
         name: 'Screen Shine Wipes',
         sku: 'V1R-850D-2',
         category: 'SIMPLE',
@@ -364,9 +407,18 @@ async function main() {
           ],
         },
       },
+      update: {
+        name: 'Screen Shine Wipes',
+        category: 'SIMPLE',
+        status: 'ACTIVE',
+        reorderPoint: 500,
+        tag: 'M',
+        supplierId: suppliers[1].id,
+      },
     }),
-    prisma.product.create({
-      data: {
+    prisma.product.upsert({
+      where: { sku: 'KIZ-B35-KA21' },
+      create: {
         name: 'DW Clock Red Stripe',
         sku: 'KIZ-B35-KA21',
         category: 'SIMPLE',
@@ -389,9 +441,18 @@ async function main() {
           ],
         },
       },
+      update: {
+        name: 'DW Clock Red Stripe',
+        category: 'SIMPLE',
+        status: 'ACTIVE',
+        reorderPoint: 0,
+        tag: 'M',
+        supplierId: suppliers[1].id,
+      },
     }),
-    prisma.product.create({
-      data: {
+    prisma.product.upsert({
+      where: { sku: '3E-KO24-SPNA' },
+      create: {
         name: 'Tea Cup Brown',
         sku: '3E-KO24-SPNA',
         category: 'SIMPLE',
@@ -415,9 +476,18 @@ async function main() {
           ],
         },
       },
+      update: {
+        name: 'Tea Cup Brown',
+        category: 'SIMPLE',
+        status: 'ACTIVE',
+        reorderPoint: 0,
+        tag: 'M',
+        supplierId: suppliers[0].id,
+      },
     }),
-    prisma.product.create({
-      data: {
+    prisma.product.upsert({
+      where: { sku: '2M-H7E3-NYQO' },
+      create: {
         name: 'Silver Keyboard White Caps',
         sku: '2M-H7E3-NYQO',
         category: 'SIMPLE',
@@ -441,9 +511,18 @@ async function main() {
           ],
         },
       },
+      update: {
+        name: 'Silver Keyboard White Caps',
+        category: 'SIMPLE',
+        status: 'LOW_STOCK',
+        reorderPoint: 15,
+        tag: 'M',
+        supplierId: suppliers[1].id,
+      },
     }),
-    prisma.product.create({
-      data: {
+    prisma.product.upsert({
+      where: { sku: 'NE-2H1A-CIK2' },
+      create: {
         name: 'Battery Charger Four Slot',
         sku: 'NE-2H1A-CIK2',
         category: 'SIMPLE',
@@ -466,6 +545,14 @@ async function main() {
           ],
         },
       },
+      update: {
+        name: 'Battery Charger Four Slot',
+        category: 'SIMPLE',
+        status: 'ACTIVE',
+        reorderPoint: 0,
+        tag: 'M',
+        supplierId: suppliers[1].id,
+      },
     }),
   ])
 
@@ -473,8 +560,9 @@ async function main() {
 
   // Create configurable products (multi-channel)
   const configurableProducts = await Promise.all([
-    prisma.product.create({
-      data: {
+    prisma.product.upsert({
+      where: { sku: 'Oxva-OXP-passion-001-10ml-10mg' },
+      create: {
         name: 'Triple Mango OX Passion Nic Salt',
         sku: 'Oxva-OXP-passion-001-10ml-10mg',
         category: 'CONFIGURABLE',
@@ -496,9 +584,17 @@ async function main() {
           ],
         },
       },
+      update: {
+        name: 'Triple Mango OX Passion Nic Salt',
+        category: 'CONFIGURABLE',
+        status: 'ACTIVE',
+        reorderPoint: 120,
+        supplierId: suppliers[0].id,
+      },
     }),
-    prisma.product.create({
-      data: {
+    prisma.product.upsert({
+      where: { sku: 'FerociousFlavours-020-120ml' },
+      create: {
         name: 'Spearmint 70/30 By Ferocious Flavours',
         sku: 'FerociousFlavours-020-120ml',
         category: 'CONFIGURABLE',
@@ -522,9 +618,18 @@ async function main() {
           ],
         },
       },
+      update: {
+        name: 'Spearmint 70/30 By Ferocious Flavours',
+        category: 'CONFIGURABLE',
+        status: 'ACTIVE',
+        reorderPoint: 0,
+        tag: 'M',
+        supplierId: suppliers[0].id,
+      },
     }),
-    prisma.product.create({
-      data: {
+    prisma.product.upsert({
+      where: { sku: 'FerociousFlavours-019-120ml' },
+      create: {
         name: 'Heizen Strawberry 70/30 By Ferocious',
         sku: 'FerociousFlavours-019-120ml',
         category: 'CONFIGURABLE',
@@ -546,6 +651,13 @@ async function main() {
           ],
         },
       },
+      update: {
+        name: 'Heizen Strawberry 70/30 By Ferocious',
+        category: 'CONFIGURABLE',
+        status: 'ACTIVE',
+        reorderPoint: 0,
+        supplierId: suppliers[0].id,
+      },
     }),
   ])
 
@@ -553,8 +665,9 @@ async function main() {
 
   // Create component products for bundles
   const componentProducts = await Promise.all([
-    prisma.product.create({
-      data: {
+    prisma.product.upsert({
+      where: { sku: 'MS-M-46' },
+      create: {
         name: "Men's Shirt M",
         sku: 'MS-M-46',
         category: 'SIMPLE',
@@ -575,9 +688,16 @@ async function main() {
           ],
         },
       },
+      update: {
+        name: "Men's Shirt M",
+        category: 'SIMPLE',
+        status: 'ACTIVE',
+        supplierId: suppliers[0].id,
+      },
     }),
-    prisma.product.create({
-      data: {
+    prisma.product.upsert({
+      where: { sku: 'MS-S-46' },
+      create: {
         name: "Men's Socks M",
         sku: 'MS-S-46',
         category: 'SIMPLE',
@@ -598,9 +718,16 @@ async function main() {
           ],
         },
       },
+      update: {
+        name: "Men's Socks M",
+        category: 'SIMPLE',
+        status: 'ACTIVE',
+        supplierId: suppliers[0].id,
+      },
     }),
-    prisma.product.create({
-      data: {
+    prisma.product.upsert({
+      where: { sku: 'MP-M-45' },
+      create: {
         name: "Men's Pants M",
         sku: 'MP-M-45',
         category: 'SIMPLE',
@@ -621,14 +748,21 @@ async function main() {
           ],
         },
       },
+      update: {
+        name: "Men's Pants M",
+        category: 'SIMPLE',
+        status: 'ACTIVE',
+        supplierId: suppliers[0].id,
+      },
     }),
   ])
 
   console.log(`✅ Created ${componentProducts.length} component products`)
 
-  // Create bundled products
-  const bundleProduct = await prisma.product.create({
-    data: {
+  // Create/update bundled products
+  const bundleProduct = await prisma.product.upsert({
+    where: { sku: 'DB-48' },
+    create: {
       name: "Men's Clothing Deal",
       sku: 'DB-48',
       category: 'BUNDLED',
@@ -649,6 +783,13 @@ async function main() {
           { platform: 'EBAY', price: 136.48 },
         ],
       },
+    },
+    update: {
+      name: "Men's Clothing Deal",
+      category: 'BUNDLED',
+      status: 'ACTIVE',
+      reorderPoint: 0,
+      supplierId: suppliers[0].id,
     },
   })
 
@@ -679,10 +820,11 @@ async function main() {
 
   console.log(`✅ Created bundle product with components`)
 
-  // Create orders
+  // Create/update orders
   const orders = await Promise.all([
-    prisma.order.create({
-      data: {
+    prisma.order.upsert({
+      where: { orderId: '10086' },
+      create: {
         orderId: '10086',
         customerId: customers[0].id, // Tom Jackson
         platform: 'SHOPIFY',
@@ -711,9 +853,19 @@ async function main() {
           ],
         },
       },
+      update: {
+        customerId: customers[0].id,
+        platform: 'SHOPIFY',
+        status: 'NEW',
+        total: 78.00,
+        currency: 'USD',
+        paid: true,
+        orderDate: new Date('2025-12-02T17:41:00'),
+      },
     }),
-    prisma.order.create({
-      data: {
+    prisma.order.upsert({
+      where: { orderId: '156845' },
+      create: {
         orderId: '156845',
         customerId: customers[1].id, // Sarah Mitchell
         platform: 'SHOPIFY',
@@ -742,9 +894,19 @@ async function main() {
           ],
         },
       },
+      update: {
+        customerId: customers[1].id,
+        platform: 'SHOPIFY',
+        status: 'NEW',
+        total: 176.00,
+        currency: 'USD',
+        paid: true,
+        orderDate: new Date('2025-12-02T17:41:00'),
+      },
     }),
-    prisma.order.create({
-      data: {
+    prisma.order.upsert({
+      where: { orderId: '111-1481331-2363411' },
+      create: {
         orderId: '111-1481331-2363411',
         customerId: customers[2].id, // Michael Rodriguez
         platform: 'EBAY',
@@ -773,9 +935,19 @@ async function main() {
           ],
         },
       },
+      update: {
+        customerId: customers[2].id,
+        platform: 'EBAY',
+        status: 'IN_PROGRESS',
+        total: 107.51,
+        currency: 'USD',
+        paid: true,
+        orderDate: new Date('2025-12-02T17:41:00'),
+      },
     }),
-    prisma.order.create({
-      data: {
+    prisma.order.upsert({
+      where: { orderId: '112-1475613-0439468' },
+      create: {
         orderId: '112-1475613-0439468',
         customerId: customers[3].id, // Emily Chen
         platform: 'EBAY',
@@ -805,38 +977,69 @@ async function main() {
           ],
         },
       },
+      update: {
+        customerId: customers[3].id,
+        platform: 'EBAY',
+        status: 'SHIPPED',
+        total: 135.31,
+        currency: 'USD',
+        paid: true,
+        trackingNumber: '584548567631',
+        orderDate: new Date('2025-12-02T17:41:00'),
+      },
     }),
   ])
 
   console.log(`✅ Created ${orders.length} orders`)
 
-  // Create platform products (links products to platforms)
+  // Create/update platform products (links products to platforms)
   const platformProducts = await Promise.all([
     // Link some products to EBAY
-    prisma.platformProduct.create({
-      data: {
+    prisma.platformProduct.upsert({
+      where: { platformSku: 'EBAY-VAR-PROD-1' },
+      create: {
         productId: simpleProducts[0].id, // A4 Paper
         platform: 'EBAY',
         platformSku: 'EBAY-VAR-PROD-1',
         listingUrl: 'https://ebay.com/itm/a4-paper-001',
         isActive: true,
       },
+      update: {
+        productId: simpleProducts[0].id,
+        platform: 'EBAY',
+        listingUrl: 'https://ebay.com/itm/a4-paper-001',
+        isActive: true,
+      },
     }),
-    prisma.platformProduct.create({
-      data: {
+    prisma.platformProduct.upsert({
+      where: { platformSku: 'EBAY-V1R-850D-2' },
+      create: {
         productId: simpleProducts[2].id, // Screen Shine Wipes
         platform: 'EBAY',
         platformSku: 'EBAY-V1R-850D-2',
         listingUrl: 'https://ebay.com/itm/screen-wipes-002',
         isActive: true,
       },
+      update: {
+        productId: simpleProducts[2].id,
+        platform: 'EBAY',
+        listingUrl: 'https://ebay.com/itm/screen-wipes-002',
+        isActive: true,
+      },
     }),
     // Link some products to SHOPIFY
-    prisma.platformProduct.create({
-      data: {
+    prisma.platformProduct.upsert({
+      where: { platformSku: 'SHOP-OXVA-001' },
+      create: {
         productId: configurableProducts[0].id, // Triple Mango OX
         platform: 'SHOPIFY',
         platformSku: 'SHOP-OXVA-001',
+        listingUrl: 'https://mystore.myshopify.com/products/mango-ox',
+        isActive: true,
+      },
+      update: {
+        productId: configurableProducts[0].id,
+        platform: 'SHOPIFY',
         listingUrl: 'https://mystore.myshopify.com/products/mango-ox',
         isActive: true,
       },
