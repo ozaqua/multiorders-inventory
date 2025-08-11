@@ -2,8 +2,7 @@
 const nextConfig = {
   // Force dynamic rendering for all pages
   experimental: {
-    dynamicIO: true,
-    staticWorkerRequestDeduping: false,
+    ppr: false, // Disable Partial Prerendering
   },
   // Disable static optimization completely
   output: 'standalone',

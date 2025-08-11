@@ -15,7 +15,9 @@ import {
 import { formatCurrency, formatDate, cn } from '@/lib/utils'
 
 // Force this page to be dynamic to prevent pre-render errors
+export const runtime = 'nodejs'
 export const dynamic = 'force-dynamic'
+export const revalidate = 0
 
 export default function OrdersPage() {
   const [orders, setOrders] = useState<OrderWithRelations[]>([])
