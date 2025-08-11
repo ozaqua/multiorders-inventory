@@ -83,10 +83,11 @@ async function main() {
 
   console.log(`✅ Created ${suppliers.length} suppliers`)
 
-  // Create customers
+  // Create/update customers
   const customers = await Promise.all([
-    prisma.customer.create({
-      data: {
+    prisma.customer.upsert({
+      where: { email: 'tom13jackson14@gmail.com' },
+      create: {
         name: 'Tom Jackson',
         email: 'tom13jackson14@gmail.com',
         phone: '5628446625',
@@ -115,9 +116,18 @@ async function main() {
           ],
         },
       },
+      update: {
+        name: 'Tom Jackson',
+        phone: '5628446625',
+        status: 'ACTIVE',
+        totalOrders: 8,
+        totalSpent: 1247.50,
+        lastOrderDate: new Date('2025-12-02'),
+      },
     }),
-    prisma.customer.create({
-      data: {
+    prisma.customer.upsert({
+      where: { email: 'sarah.mitchell@email.com' },
+      create: {
         name: 'Sarah Mitchell',
         email: 'sarah.mitchell@email.com',
         phone: '5551234567',
@@ -147,9 +157,18 @@ async function main() {
           ],
         },
       },
+      update: {
+        name: 'Sarah Mitchell',
+        phone: '5551234567',
+        status: 'ACTIVE',
+        totalOrders: 15,
+        totalSpent: 2156.75,
+        lastOrderDate: new Date('2025-11-28'),
+      },
     }),
-    prisma.customer.create({
-      data: {
+    prisma.customer.upsert({
+      where: { email: 'mrodriguez@example.com' },
+      create: {
         name: 'Michael Rodriguez',
         email: 'mrodriguez@example.com',
         status: 'ACTIVE',
@@ -176,9 +195,17 @@ async function main() {
           ],
         },
       },
+      update: {
+        name: 'Michael Rodriguez',
+        status: 'ACTIVE',
+        totalOrders: 3,
+        totalSpent: 487.25,
+        lastOrderDate: new Date('2025-11-20'),
+      },
     }),
-    prisma.customer.create({
-      data: {
+    prisma.customer.upsert({
+      where: { email: 'emily.chen@gmail.com' },
+      create: {
         name: 'Emily Chen',
         email: 'emily.chen@gmail.com',
         phone: '4165551234',
@@ -207,9 +234,18 @@ async function main() {
           ],
         },
       },
+      update: {
+        name: 'Emily Chen',
+        phone: '4165551234',
+        status: 'ACTIVE',
+        totalOrders: 12,
+        totalSpent: 1698.40,
+        lastOrderDate: new Date('2025-12-01'),
+      },
     }),
-    prisma.customer.create({
-      data: {
+    prisma.customer.upsert({
+      where: { email: 'jwilson@business.com' },
+      create: {
         name: 'James Wilson',
         email: 'jwilson@business.com',
         status: 'INACTIVE',
@@ -235,6 +271,13 @@ async function main() {
             { platform: 'EBAY' },
           ],
         },
+      },
+      update: {
+        name: 'James Wilson',
+        status: 'INACTIVE',
+        totalOrders: 1,
+        totalSpent: 127.99,
+        lastOrderDate: new Date('2025-01-15'),
       },
     }),
   ])
