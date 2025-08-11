@@ -1,6 +1,6 @@
-# Multiorders Inventory Management System
+# INVENTREE PLUS - Advanced Inventory Management
 
-A comprehensive inventory management system built with Next.js 14, TypeScript, Prisma, and PostgreSQL. This application supports multi-platform e-commerce inventory management across Amazon, eBay, Shopify, Wix, and Etsy.
+A comprehensive inventory management system built with Next.js 14, TypeScript, Prisma, and PostgreSQL. This professional application supports multi-platform e-commerce inventory management with advanced bundle tracking for eBay, Shopify, and Etsy.
 
 ## Features
 
@@ -33,7 +33,7 @@ A comprehensive inventory management system built with Next.js 14, TypeScript, P
 1. Clone the repository
 ```bash
 git clone <your-repo-url>
-cd multiorders-inventory
+cd inventree-plus
 ```
 
 2. Install dependencies
@@ -48,7 +48,7 @@ cp .env.example .env
 
 Update `.env` with your database connection string:
 ```env
-DATABASE_URL="postgresql://username:password@localhost:5432/multiorders_inventory"
+DATABASE_URL="postgresql://username:password@localhost:5432/inventree_plus"
 ```
 
 ### Database Setup
@@ -160,7 +160,7 @@ npm run db:studio
 
 ```env
 # Database
-DATABASE_URL="postgresql://username:password@localhost:5432/multiorders_inventory"
+DATABASE_URL="postgresql://username:password@localhost:5432/inventree_plus"
 
 # Authentication (optional)
 NEXTAUTH_SECRET="your-secret-key"
