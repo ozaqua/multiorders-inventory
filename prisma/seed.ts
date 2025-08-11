@@ -7,7 +7,42 @@ const prisma = new PrismaClient()
 async function main() {
   console.log('🌱 Starting database seeding...')
 
-  // Create suppliers first
+  // Create platform integrations first (needed for customer platform associations)
+  const integrations = await Promise.all([
+    prisma.platformIntegration.create({
+      data: {
+        platform: 'EBAY',
+        status: 'LIVE',
+        region: 'US',
+        syncEnabled: true,
+        productCount: 145,
+        lastSync: new Date(),
+      },
+    }),
+    prisma.platformIntegration.create({
+      data: {
+        platform: 'SHOPIFY',
+        status: 'LIVE',
+        syncEnabled: true,
+        productCount: 67,
+        lastSync: new Date(),
+      },
+    }),
+    prisma.platformIntegration.create({
+      data: {
+        platform: 'ETSY',
+        status: 'ERRORED',
+        syncEnabled: false,
+        productCount: 23,
+        lastError: 'API authentication failed',
+        errorCount: 3,
+      },
+    }),
+  ])
+
+  console.log(`✅ Created ${integrations.length} platform integrations`)
+
+  // Create suppliers
   const suppliers = await Promise.all([
     prisma.supplier.create({
       data: {
@@ -728,41 +763,6 @@ async function main() {
   ])
 
   console.log(`✅ Created ${orders.length} orders`)
-
-  // Create platform integrations
-  const integrations = await Promise.all([
-    prisma.platformIntegration.create({
-      data: {
-        platform: 'EBAY',
-        status: 'LIVE',
-        region: 'US',
-        syncEnabled: true,
-        productCount: 145,
-        lastSync: new Date(),
-      },
-    }),
-    prisma.platformIntegration.create({
-      data: {
-        platform: 'SHOPIFY',
-        status: 'LIVE',
-        syncEnabled: true,
-        productCount: 67,
-        lastSync: new Date(),
-      },
-    }),
-    prisma.platformIntegration.create({
-      data: {
-        platform: 'ETSY',
-        status: 'ERRORED',
-        syncEnabled: false,
-        productCount: 23,
-        lastError: 'API authentication failed',
-        errorCount: 3,
-      },
-    }),
-  ])
-
-  console.log(`✅ Created ${integrations.length} platform integrations`)
 
   console.log('🎉 Database seeding completed successfully!')
   console.log('\nSummary:')
