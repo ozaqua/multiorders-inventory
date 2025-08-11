@@ -242,7 +242,7 @@ const getPlatformBadge = (platform: string) => {
     ebay: { color: 'bg-blue-500', name: 'eBay' },
     shopify: { color: 'bg-green-500', name: 'Shopify' },
     etsy: { color: 'bg-orange-600', name: 'Etsy' },
-    multiorders: { color: 'bg-gray-600', name: 'Internal' }
+    multiorders: { color: 'bg-blue-600', name: 'INVENTREE PLUS' }
   }
   
   const config = platforms[platform.toLowerCase()] || { color: 'bg-gray-500', name: platform }
