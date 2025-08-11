@@ -1006,52 +1006,64 @@ async function main() {
   const platformProducts = await Promise.all([
     // Link some products to EBAY
     prisma.platformProduct.upsert({
-      where: { platformSku: 'EBAY-VAR-PROD-1' },
+      where: { 
+        productId_platform: {
+          productId: simpleProducts[0].id,
+          platform: 'EBAY',
+        }
+      },
       create: {
         productId: simpleProducts[0].id, // A4 Paper
         platform: 'EBAY',
         platformSku: 'EBAY-VAR-PROD-1',
-        listingUrl: 'https://ebay.com/itm/a4-paper-001',
-        isActive: true,
+        title: 'A4 Paper - Premium Quality',
+        description: 'High quality A4 paper for all your printing needs',
+        isListed: true,
       },
       update: {
-        productId: simpleProducts[0].id,
-        platform: 'EBAY',
-        listingUrl: 'https://ebay.com/itm/a4-paper-001',
-        isActive: true,
+        platformSku: 'EBAY-VAR-PROD-1',
+        isListed: true,
       },
     }),
     prisma.platformProduct.upsert({
-      where: { platformSku: 'EBAY-V1R-850D-2' },
+      where: { 
+        productId_platform: {
+          productId: simpleProducts[2].id,
+          platform: 'EBAY',
+        }
+      },
       create: {
         productId: simpleProducts[2].id, // Screen Shine Wipes
         platform: 'EBAY',
         platformSku: 'EBAY-V1R-850D-2',
-        listingUrl: 'https://ebay.com/itm/screen-wipes-002',
-        isActive: true,
+        title: 'Screen Shine Wipes - Electronics Cleaner',
+        description: 'Professional screen cleaning wipes for all devices',
+        isListed: true,
       },
       update: {
-        productId: simpleProducts[2].id,
-        platform: 'EBAY',
-        listingUrl: 'https://ebay.com/itm/screen-wipes-002',
-        isActive: true,
+        platformSku: 'EBAY-V1R-850D-2',
+        isListed: true,
       },
     }),
     // Link some products to SHOPIFY
     prisma.platformProduct.upsert({
-      where: { platformSku: 'SHOP-OXVA-001' },
+      where: { 
+        productId_platform: {
+          productId: configurableProducts[0].id,
+          platform: 'SHOPIFY',
+        }
+      },
       create: {
         productId: configurableProducts[0].id, // Triple Mango OX
         platform: 'SHOPIFY',
         platformSku: 'SHOP-OXVA-001',
-        listingUrl: 'https://mystore.myshopify.com/products/mango-ox',
-        isActive: true,
+        title: 'Triple Mango OX Passion Nic Salt',
+        description: 'Premium vape juice with tropical mango flavor',
+        isListed: true,
       },
       update: {
-        productId: configurableProducts[0].id,
-        platform: 'SHOPIFY',
-        listingUrl: 'https://mystore.myshopify.com/products/mango-ox',
-        isActive: true,
+        platformSku: 'SHOP-OXVA-001',
+        isListed: true,
       },
     }),
   ])
