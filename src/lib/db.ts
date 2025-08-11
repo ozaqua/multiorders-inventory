@@ -1,4 +1,4 @@
-// Database client and utilities for Multiorders Inventory Management System
+// Database client and utilities for INVENTREE PLUS
 
 import { PrismaClient } from '../generated/prisma'
 
@@ -8,7 +8,10 @@ declare global {
 }
 
 // Prevent multiple instances of Prisma Client in development
-const prisma = globalThis.prisma ?? new PrismaClient()
+const prisma = globalThis.prisma ?? new PrismaClient({
+  log: process.env.NODE_ENV === 'development' ? ['query', 'error', 'warn'] : ['error'],
+  datasourceUrl: process.env.DATABASE_URL,
+})
 
 if (process.env.NODE_ENV !== 'production') {
   globalThis.prisma = prisma

@@ -1,5 +1,12 @@
 /** @type {import('next').NextConfig} */
 const nextConfig = {
+  // Force dynamic rendering for all pages
+  experimental: {
+    dynamicIO: true,
+    staticWorkerRequestDeduping: false,
+  },
+  // Disable static optimization completely
+  output: 'standalone',
   // Disable external connections that might trigger DNS requests
   images: {
     domains: ['localhost'],
