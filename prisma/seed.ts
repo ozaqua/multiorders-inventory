@@ -776,26 +776,53 @@ async function main() {
     },
   })
 
-  // Create bundle components
+  // Create or update bundle components
   await Promise.all([
-    prisma.bundleComponent.create({
-      data: {
+    prisma.bundleComponent.upsert({
+      where: {
+        bundleId_componentId: {
+          bundleId: bundleProduct.id,
+          componentId: componentProducts[0].id, // Men's Shirt M
+        },
+      },
+      create: {
         bundleId: bundleProduct.id,
-        componentId: componentProducts[0].id, // Men's Shirt M
+        componentId: componentProducts[0].id,
+        quantityNeeded: 5,
+      },
+      update: {
         quantityNeeded: 5,
       },
     }),
-    prisma.bundleComponent.create({
-      data: {
+    prisma.bundleComponent.upsert({
+      where: {
+        bundleId_componentId: {
+          bundleId: bundleProduct.id,
+          componentId: componentProducts[1].id, // Men's Socks M
+        },
+      },
+      create: {
         bundleId: bundleProduct.id,
-        componentId: componentProducts[1].id, // Men's Socks M
+        componentId: componentProducts[1].id,
+        quantityNeeded: 0,
+      },
+      update: {
         quantityNeeded: 0,
       },
     }),
-    prisma.bundleComponent.create({
-      data: {
+    prisma.bundleComponent.upsert({
+      where: {
+        bundleId_componentId: {
+          bundleId: bundleProduct.id,
+          componentId: componentProducts[2].id, // Men's Pants M
+        },
+      },
+      create: {
         bundleId: bundleProduct.id,
-        componentId: componentProducts[2].id, // Men's Pants M
+        componentId: componentProducts[2].id,
+        quantityNeeded: 1,
+      },
+      update: {
         quantityNeeded: 1,
       },
     }),
@@ -1031,37 +1058,35 @@ async function main() {
 
   console.log(`✅ Created ${platformProducts.length} platform product links`)
 
-  // Create dashboard metrics
+  // Create dashboard metrics (delete existing ones first to avoid duplicates)
+  await prisma.dashboardMetric.deleteMany({})
+  
   const dashboardMetrics = await Promise.all([
     prisma.dashboardMetric.create({
       data: {
-        metric: 'TOTAL_REVENUE',
-        value: 93347.37,
-        period: 'ALL_TIME',
+        metricType: 'TOTAL_REVENUE',
+        floatValue: 93347.37,
         date: new Date(),
       },
     }),
     prisma.dashboardMetric.create({
       data: {
-        metric: 'TOTAL_ORDERS',
-        value: 1247,
-        period: 'ALL_TIME', 
+        metricType: 'TOTAL_ORDERS',
+        intValue: 1247,
         date: new Date(),
       },
     }),
     prisma.dashboardMetric.create({
       data: {
-        metric: 'ACTIVE_CUSTOMERS',
-        value: 438,
-        period: 'ALL_TIME',
+        metricType: 'ACTIVE_CUSTOMERS',
+        intValue: 438,
         date: new Date(),
       },
     }),
     prisma.dashboardMetric.create({
       data: {
-        metric: 'LOW_STOCK_ALERTS',
-        value: 12,
-        period: 'CURRENT',
+        metricType: 'LOW_STOCK_ALERTS',
+        intValue: 12,
         date: new Date(),
       },
     }),
