@@ -47,63 +47,46 @@ async function main() {
 
   console.log(`✅ Created ${integrations.length} platform integrations`)
 
-  // Create/update suppliers
-  const suppliers = await Promise.all([
-    prisma.supplier.upsert({
-      where: { email: 'orders@calypso-co.com' },
-      create: {
-        name: 'Calypso Co.',
-        email: 'orders@calypso-co.com',
-        phone: '+1-555-0123',
-        address: '123 Supplier St, Business City, BC 12345',
-        isActive: true,
-        notes: 'Primary clothing and accessories supplier',
-      },
-      update: {
-        name: 'Calypso Co.',
-        phone: '+1-555-0123',
-        address: '123 Supplier St, Business City, BC 12345',
-        isActive: true,
-        notes: 'Primary clothing and accessories supplier',
-      },
-    }),
-    prisma.supplier.upsert({
-      where: { email: 'sales@techparts.com' },
-      create: {
-        name: 'TechParts Ltd',
-        email: 'sales@techparts.com',
-        phone: '+1-555-0456',
-        address: '456 Tech Ave, Electronics City, EC 67890',
-        isActive: true,
-        notes: 'Electronics and gadgets supplier',
-      },
-      update: {
-        name: 'TechParts Ltd',
-        phone: '+1-555-0456',
-        address: '456 Tech Ave, Electronics City, EC 67890',
-        isActive: true,
-        notes: 'Electronics and gadgets supplier',
-      },
-    }),
-    prisma.supplier.upsert({
-      where: { email: 'info@office-essentials.com' },
-      create: {
-        name: 'Office Essentials Inc',
-        email: 'info@office-essentials.com',
-        phone: '+1-555-0789',
-        address: '789 Office Blvd, Business Park, BP 54321',
-        isActive: true,
-        notes: 'Office supplies and stationery',
-      },
-      update: {
-        name: 'Office Essentials Inc',
-        phone: '+1-555-0789',
-        address: '789 Office Blvd, Business Park, BP 54321',
-        isActive: true,
-        notes: 'Office supplies and stationery',
-      },
-    }),
-  ])
+  // Create suppliers if they don't exist (using findFirst to check)
+  const existingSuppliers = await prisma.supplier.findMany()
+  const suppliersByName = new Map(existingSuppliers.map(s => [s.name, s]))
+  
+  const suppliersData = [
+    {
+      name: 'Calypso Co.',
+      email: 'orders@calypso-co.com',
+      phone: '+1-555-0123',
+      address: '123 Supplier St, Business City, BC 12345',
+      isActive: true,
+      notes: 'Primary clothing and accessories supplier',
+    },
+    {
+      name: 'TechParts Ltd',
+      email: 'sales@techparts.com',
+      phone: '+1-555-0456',
+      address: '456 Tech Ave, Electronics City, EC 67890',
+      isActive: true,
+      notes: 'Electronics and gadgets supplier',
+    },
+    {
+      name: 'Office Essentials Inc',
+      email: 'info@office-essentials.com',
+      phone: '+1-555-0789',
+      address: '789 Office Blvd, Business Park, BP 54321',
+      isActive: true,
+      notes: 'Office supplies and stationery',
+    },
+  ]
+
+  const suppliers = await Promise.all(
+    suppliersData.map(async (data) => {
+      const existing = suppliersByName.get(data.name)
+      if (existing) {
+        return existing
+      }
+      return prisma.supplier.create({ data })
+    })
+  )
 
   console.log(`✅ Created ${suppliers.length} suppliers`)
 
