@@ -1,6 +1,6 @@
 // Legacy mock data file - database integration has replaced most of this
 
-// Mock data matching multiorders screenshots  
+// Legacy mock data - retained for reference  
 export const mockProducts: Record<string, unknown>[] = [
   {
     id: '1',
