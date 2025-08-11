@@ -7,8 +7,8 @@ import { ToastProvider } from '@/components/ui/Toast'
 const inter = Inter({ subsets: ['latin'] })
 
 export const metadata: Metadata = {
-  title: "Multiorders - Inventory Management System",
-  description: "Professional multi-channel inventory management and order fulfillment platform",
+  title: "INVENTREE PLUS - Advanced Inventory Management",
+  description: "Professional multi-platform inventory management with advanced bundle tracking for eBay, Shopify, and Etsy",
 };
 
 export default function RootLayout({
