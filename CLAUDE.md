@@ -4,9 +4,9 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 ## 🎯 Project Status: PRODUCTION-READY
 
-This is a **fully functional** multi-platform inventory management system inspired by multiorders. The application is 100% complete with database integration and ready for production use.
+This is **INVENTREE PLUS** - a fully functional multi-platform inventory management system with advanced bundle management. The application is 100% complete with database integration and ready for production use.
 
-**Live Application**: https://multiorders-inventory-[user-url].vercel.app  
+**Live Application**: https://inventree.plus (inventree-plus.vercel.app)  
 **Local Development**: `npm run dev` (runs on port 3000)  
 **Production Build**: `npm run build && npm start` (runs on port 3000)
 
@@ -20,7 +20,7 @@ When starting a new Claude Code session to continue work on this project:
 
 ### Quick Context Prompt for New Sessions:
 ```
-I'm continuing work on my multiorders-inspired inventory management system. Please read the MULTIORDERS_PROJECT_PROGRESS.md file at '/Users/kevin/claude projects/project001/MULTIORDERS_PROJECT_PROGRESS.md' to understand the current status. The working application is in '/Users/kevin/claude projects/multiorders-inventory' and is 100% complete with full database integration.
+I'm continuing work on my INVENTREE PLUS inventory management system. Please read the MULTIORDERS_PROJECT_PROGRESS.md file at '/Users/kevin/claude projects/project001/MULTIORDERS_PROJECT_PROGRESS.md' to understand the current status. The working application is in '/Users/kevin/claude projects/multiorders-inventory' and is 100% complete with full database integration.
 
 UPDATE: All deployment errors have been FIXED! ✅
 
@@ -50,6 +50,21 @@ UPDATE: All deployment errors have been FIXED! ✅
 - ✅ **Local .env:** Point DATABASE_URL to cloud database, not localhost
 
 **Impact:** Must configure all services to use remote connections rather than localhost.
+
+## 🎯 **USER EXPERTISE & PROJECT BACKGROUND**
+
+**Bundle Management Expert:** User has 5+ years deep expertise with inventory bundle systems, having used multiple paid platforms extensively. This is their PRIMARY use case and life's work - creating bundle products to solve eBay's inventory tracking limitations.
+
+**Core Problem Being Solved:** eBay doesn't communicate individual SKU deductions when selling multi-item listings (e.g., red+blue+yellow items sold as one listing). User needs bundles to map eBay listings → Shopify products → individual component SKUs for accurate inventory tracking.
+
+**Bundle Logic Expertise:**
+- eBay listing sells → finds linked Shopify product → identifies as bundle → deducts component SKUs
+- Critical for complex listings and quantity packs (e.g., 6-pack = 1 sale but 6 SKU deductions)
+- Prevents over-selling by maintaining accurate component inventory
+
+**Project Vision:** User has been sitting on multiple innovative project ideas for years, afraid to share due to potential theft. This represents their first step toward building their own solutions rather than explaining ideas to other developers.
+
+**Excitement Focus:** Bundle creation and management features are the most important functionality.
 ```
 
 ## 🛠 Development Commands
