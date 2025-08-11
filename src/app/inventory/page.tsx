@@ -36,10 +36,7 @@ const platforms = [
   { name: 'etsy', color: 'bg-orange-600', textColor: 'text-white' }
 ]
 
-// Force this page to be dynamic to prevent pre-render errors
-export const runtime = 'nodejs'
-export const dynamic = 'force-dynamic'
-export const revalidate = 0
+// Client component - uses dynamic data fetching
 
 export default function InventoryPage() {
   const [activeCategory, setActiveCategory] = useState('all')

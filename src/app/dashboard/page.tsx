@@ -16,10 +16,7 @@ interface SalesChannel {
   orderCount: number
 }
 
-// Force this page to be dynamic to prevent pre-render errors
-export const runtime = 'nodejs'
-export const dynamic = 'force-dynamic'
-export const revalidate = 0
+// Client component - uses dynamic data fetching
 
 export default function DashboardPage() {
   const [dashboardMetrics, setDashboardMetrics] = useState<DashboardMetrics | null>(null)

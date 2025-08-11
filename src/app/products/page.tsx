@@ -39,10 +39,7 @@ interface BundleProduct extends ProductWithRelations {
   retailPrice: number
 }
 
-// Force this page to be dynamic to prevent pre-render errors
-export const runtime = 'nodejs'
-export const dynamic = 'force-dynamic'
-export const revalidate = 0
+// Client component - uses dynamic data fetching
 
 export default function ProductsPage() {
   const [activeCategory, setActiveCategory] = useState('bundled')
