@@ -4,7 +4,7 @@ export const revalidate = 0
 
 import { neon } from '@neondatabase/serverless';
 
-export function Page() {
+export function default Page() {
   async function create(formData: FormData) {
     'use server';
     // Connect to the Neon database
