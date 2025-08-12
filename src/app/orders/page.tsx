@@ -3,7 +3,6 @@
 import { useState, useEffect } from 'react'
 
 import type { OrderWithRelations } from '@/lib/database/orders'
-import { getAllOrders } from '@/lib/database/orders'
 import Button from '@/components/ui/Button'
 import Badge from '@/components/ui/Badge'
 import { 

@@ -7,7 +7,6 @@ import { Download, Calendar, Plus, RefreshCw } from 'lucide-react'
 import Button from '@/components/ui/Button'
 import Badge from '@/components/ui/Badge'
 import { Card, CardHeader, CardContent, CardTitle, CardDescription } from '@/components/ui/Card'
-import { getDashboardMetrics, getSalesByChannel, getOrderStatusBreakdown } from '@/lib/database/dashboard'
 import type { DashboardMetrics } from '@/types'
 
 interface SalesChannel {
@@ -49,7 +48,7 @@ export default function DashboardPage() {
           CANCELLED: 'bg-red-500',
         }
 
-        const formattedStatuses = data.statusBreakdown.map((item: any) => ({
+        const formattedStatuses = data.statusBreakdown.map((item: { status: string; count: number }) => ({
           status: item.status.replace('_', '-').toLowerCase().replace(/\b\w/g, l => l.toUpperCase()),
           count: item.count,
           color: statusColors[item.status] || 'bg-gray-500',
