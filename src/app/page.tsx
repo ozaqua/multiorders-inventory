@@ -1,12 +1,16 @@
 import { redirect } from 'next/navigation'
 
+export function HomePage() {
+  redirect('/dashboard')
+}
+
 export const runtime = 'nodejs'
 export const dynamic = 'force-dynamic'
 export const revalidate = 0
 
 import { neon } from '@neondatabase/serverless';
 
-export default function Page() {
+export function Page() {
   async function create(formData: FormData) {
     'use server';
     // Connect to the Neon database
