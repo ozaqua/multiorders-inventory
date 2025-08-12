@@ -27,8 +27,13 @@ export default function OrdersPage() {
   useEffect(() => {
     async function fetchOrders() {
       try {
-        const fetchedOrders = await getAllOrders()
-        setOrders(fetchedOrders)
+        const response = await fetch('/api/orders')
+        const fetchedOrders = await response.json()
+        if (response.ok) {
+          setOrders(fetchedOrders)
+        } else {
+          throw new Error(fetchedOrders.error || 'Failed to fetch orders')
+        }
       } catch (err) {
         console.error('Failed to fetch orders:', err)
         setError(`Failed to load orders: ${err instanceof Error ? err.message : 'Unknown error'}`)

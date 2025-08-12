@@ -29,14 +29,15 @@ export default function DashboardPage() {
     async function fetchDashboardData() {
       try {
         setLoading(true)
-        const [metrics, channels, statusBreakdown] = await Promise.all([
-          getDashboardMetrics(),
-          getSalesByChannel(),
-          getOrderStatusBreakdown(),
-        ])
+        const response = await fetch('/api/dashboard')
+        const data = await response.json()
 
-        setDashboardMetrics(metrics)
-        setSalesByChannel(channels)
+        if (!response.ok) {
+          throw new Error(data.error || 'Failed to fetch dashboard data')
+        }
+
+        setDashboardMetrics(data.metrics)
+        setSalesByChannel(data.channels)
         
         // Map status breakdown to display format with colors
         const statusColors: Record<string, string> = {
@@ -48,7 +49,7 @@ export default function DashboardPage() {
           CANCELLED: 'bg-red-500',
         }
 
-        const formattedStatuses = statusBreakdown.map(item => ({
+        const formattedStatuses = data.statusBreakdown.map((item: any) => ({
           status: item.status.replace('_', '-').toLowerCase().replace(/\b\w/g, l => l.toUpperCase()),
           count: item.count,
           color: statusColors[item.status] || 'bg-gray-500',
