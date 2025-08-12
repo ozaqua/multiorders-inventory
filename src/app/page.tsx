@@ -4,10 +4,6 @@ export const runtime = 'nodejs'
 export const dynamic = 'force-dynamic'
 export const revalidate = 0
 
-export default function HomePage() {
-  redirect('/dashboard')
-}
-
 import { neon } from '@neondatabase/serverless';
 
 export default function Page() {
