@@ -11,7 +11,7 @@ export default function Page() {
     const sql = neon(`${process.env.DATABASE_URL}`);
     const comment = formData.get('comment');
     // Insert the comment from the form into the Postgres database
-    await sql(insert into comments (comment) values ($1), [comment])
+    await sql(insert ',' into comments (comment) values ($1), [comment])
   }
 
   return (
