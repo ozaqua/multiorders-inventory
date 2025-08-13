@@ -140,11 +140,6 @@ export async function getBundledProducts() {
         inBundles: {
           include: {
             component: {
-              select: {
-                id: true,
-                name: true,
-                sku: true,
-              },
               include: {
                 warehouse: {
                   select: {
