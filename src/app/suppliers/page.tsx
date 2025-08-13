@@ -1,13 +1,12 @@
 'use client'
 
-import { useState, useEffect } from 'react'
+import { useState, useEffect, useCallback } from 'react'
 import Button from '@/components/ui/Button'
 import Badge from '@/components/ui/Badge'
-import { Card, CardHeader, CardContent, CardTitle, CardDescription } from '@/components/ui/Card'
+import { Card, CardContent } from '@/components/ui/Card'
 import { 
   Truck,
   Search,
-  Filter,
   Plus,
   Eye,
   Edit,
@@ -16,7 +15,6 @@ import {
   Mail,
   Globe,
   MapPin,
-  Calendar,
   DollarSign,
   Package,
   Clock,
@@ -78,11 +76,7 @@ export default function SuppliersPage() {
   const [selectedSupplier, setSelectedSupplier] = useState<Supplier | null>(null)
   const [showDetails, setShowDetails] = useState(false)
 
-  useEffect(() => {
-    fetchSuppliers()
-  }, [filterStatus])
-
-  const fetchSuppliers = async () => {
+  const fetchSuppliers = useCallback(async () => {
     try {
       setLoading(true)
       const url = new URL('/api/suppliers', window.location.origin)
@@ -105,7 +99,11 @@ export default function SuppliersPage() {
     } finally {
       setLoading(false)
     }
-  }
+  }, [filterStatus])
+
+  useEffect(() => {
+    fetchSuppliers()
+  }, [fetchSuppliers])
 
   const filteredSuppliers = suppliers.filter(supplier => {
     const matchesSearch = 
