@@ -100,7 +100,7 @@ export default function DashboardPage() {
 
       {/* Today's Active Order Status */}
       <div className="bg-white rounded-lg p-6 mb-6 shadow-sm">
-        <h2 className="text-lg font-medium text-gray-900 mb-4">Today's Active Order Status</h2>
+        <h2 className="text-lg font-medium text-gray-900 mb-4">Today&apos;s Active Order Status</h2>
         <div className="grid grid-cols-5 gap-6">
           {[
             { label: 'New', count: data?.statusBreakdown.find(s => s.status === 'NEW')?.count || 61, color: 'text-blue-600' },
