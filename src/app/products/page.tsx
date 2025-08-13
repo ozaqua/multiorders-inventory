@@ -275,8 +275,7 @@ export default function ProductsPage() {
         {filteredProducts.map((product) => (
           <ProductCard 
             key={product.id} 
-            product={product} 
-            activeTab={activeTab}
+            product={product}
           />
         ))}
       </div>
