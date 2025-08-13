@@ -2,8 +2,7 @@
 
 import { useState, useEffect } from 'react'
 
-import { getAllProducts, getProductsByCategory } from '@/lib/database/products'
-import type { ProductWithRelations, ProductCategory } from '@/types'
+import type { ProductWithRelations } from '@/types'
 import Button from '@/components/ui/Button'
 import Badge from '@/components/ui/Badge'
 import { 
@@ -49,15 +48,19 @@ export default function InventoryPage() {
     async function fetchProducts() {
       try {
         setLoading(true)
-        let productsData: ProductWithRelations[]
-        
-        if (activeCategory === 'all') {
-          productsData = await getAllProducts()
-        } else {
-          productsData = await getProductsByCategory(activeCategory.toUpperCase() as ProductCategory)
+        const url = new URL('/api/inventory', window.location.origin)
+        if (activeCategory !== 'all') {
+          url.searchParams.set('category', activeCategory)
         }
         
-        setProducts(productsData)
+        const response = await fetch(url.toString())
+        const data = await response.json()
+
+        if (!response.ok) {
+          throw new Error(data.error || 'Failed to fetch inventory data')
+        }
+
+        setProducts(data.products)
       } catch (err) {
         console.error('Error fetching products:', err)
         setError(`Failed to load products: ${err instanceof Error ? err.message : 'Unknown error'}`)
