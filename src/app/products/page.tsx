@@ -1,6 +1,7 @@
 'use client'
 
 import { useState, useEffect } from 'react'
+import { useRouter } from 'next/navigation'
 import type { ProductWithRelations } from '@/types'
 import Button from '@/components/ui/Button'
 import Badge from '@/components/ui/Badge'
@@ -308,10 +309,16 @@ export default function ProductsPage() {
 function ProductCard({ product }: { 
   product: ProductWithRelations | BundleProduct
 }) {
+  const router = useRouter()
   const isBundle = 'components' in product
   
+  const handleViewProduct = () => {
+    router.push(`/products/${product.id}`)
+  }
+  
   return (
-    <div className="bg-white border border-gray-200 rounded-lg p-6 hover:shadow-md transition-shadow">
+    <div className="bg-white border border-gray-200 rounded-lg p-6 hover:shadow-md transition-shadow cursor-pointer"
+         onClick={handleViewProduct}>
       <div className="flex items-start justify-between">
         <div className="flex items-center space-x-4">
           <div className="w-16 h-16 bg-blue-100 rounded-lg flex items-center justify-center">
@@ -353,13 +360,34 @@ function ProductCard({ product }: {
             </div>
           )}
           <div className="flex items-center space-x-2">
-            <Button variant="outline" size="sm">
+            <Button 
+              variant="outline" 
+              size="sm"
+              onClick={(e) => {
+                e.stopPropagation()
+                handleViewProduct()
+              }}
+            >
               <Eye className="h-4 w-4" />
             </Button>
-            <Button variant="outline" size="sm">
+            <Button 
+              variant="outline" 
+              size="sm"
+              onClick={(e) => {
+                e.stopPropagation()
+                // Edit functionality
+              }}
+            >
               <Edit className="h-4 w-4" />
             </Button>
-            <Button variant="outline" size="sm">
+            <Button 
+              variant="outline" 
+              size="sm"
+              onClick={(e) => {
+                e.stopPropagation()
+                // More options
+              }}
+            >
               <MoreVertical className="h-4 w-4" />
             </Button>
           </div>
