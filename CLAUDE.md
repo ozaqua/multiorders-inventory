@@ -2,13 +2,13 @@
 
 This file provides guidance to Claude Code (claude.ai/code) when working with code in this repository.
 
-## 🎯 Project Status: PRODUCTION-READY
+## 🎯 Project Status: SUCCESSFULLY DEPLOYED TO PRODUCTION
 
-This is **INVENTREE PLUS** - a fully functional multi-platform inventory management system with advanced bundle management. The application is 100% complete with database integration and ready for production use.
+This is **INVENTREE PLUS** - a fully functional multi-platform inventory management system with advanced bundle management. The application is 100% complete with database integration and is currently **LIVE IN PRODUCTION**.
 
-**Live Application**: https://inventree.plus (inventree-plus.vercel.app)  
-**Local Development**: `npm run dev` (runs on port 3000)  
-**Production Build**: `npm run build && npm start` (runs on port 3000)
+**Live Application**: https://multiorders-inventory-hvo27i5zd-kevins-projects-debd45b0.vercel.app  
+**Database**: Neon PostgreSQL (cloud) - fully connected and seeded with data  
+**Status**: ✅ Dashboard displaying real data, all features operational
 
 ## 📋 Project Continuation Guide
 
@@ -35,21 +35,20 @@ UPDATE: All deployment errors have been FIXED! ✅
 
 **Status:** ✅ READY FOR DEPLOYMENT - All Vercel deployment issues resolved
 
-## ⚠️ **IMPORTANT: Localhost Connectivity Issues**
+## ⚠️ **CRITICAL: Localhost Connectivity Issues**
 
-**Known Issue:** This development environment has persistent localhost connectivity problems that prevent connecting to local services on any port (tested ports 3000, 4000, 5000, 8080, 9000). This affects:
-- Local development servers
-- Local database connections (PostgreSQL on localhost:5432)
-- Any localhost-based services
+**PERMANENT ISSUE:** User's environment CANNOT connect to localhost on ANY port. This is not fixable.
 
-**Root Cause:** Unknown - persists even with direct ISP connection (bypassing UniFi router)
+**Affected Ports Tested:** 3000, 4000, 5000, 8080, 9000 - ALL FAIL
+**Root Cause:** Unknown network issue (not router, not firewall - persists with direct ISP)
 
-**Workaround:** Always use cloud-based services:
-- ✅ **Database:** Use Neon/Supabase instead of local PostgreSQL
-- ✅ **Development:** Use Vercel deployments for testing
-- ✅ **Local .env:** Point DATABASE_URL to cloud database, not localhost
+**MANDATORY WORKAROUNDS:**
+- ✅ **Testing:** ALWAYS use `vercel --prod` for testing changes
+- ✅ **Database:** ALWAYS use Neon cloud database (never local PostgreSQL)
+- ✅ **Development:** Skip `npm run dev` - deploy directly to Vercel
+- ✅ **Debugging:** Use Vercel logs instead of local console
 
-**Impact:** Must configure all services to use remote connections rather than localhost.
+**DO NOT ATTEMPT:** Local development server, local database connections, or any localhost URLs.
 
 ## 🎯 **USER EXPERTISE & PROJECT BACKGROUND**
 
@@ -202,6 +201,52 @@ I need help with [complex technical task]. Please use the Task tool to deploy a 
 - **Context Preservation**: Maintain project understanding throughout implementation
 - **Quality Assurance**: Built-in error handling and validation
 
+## 🔧 **CRITICAL TECHNICAL SOLUTIONS**
+
+### **Client Components + API Routes Architecture**
+All pages use `'use client'` but CANNOT directly call Prisma. Solution:
+
+```typescript
+// ❌ WRONG - Client component calling Prisma directly
+const data = await getAllOrders()  // FAILS
+
+// ✅ CORRECT - Client component calling API route
+const response = await fetch('/api/orders')
+const data = await response.json()
+```
+
+**API Routes Created:**
+- `/api/dashboard` - Returns metrics, channels, statusBreakdown
+- `/api/orders` - Returns all orders with relations
+- `/api/products` - Returns all products with warehouse data
+
+### **Database Seeding with Upserts**
+Seed script uses `upsert` for ALL operations to handle existing data:
+
+```typescript
+// ✅ Handles existing records gracefully
+prisma.product.upsert({
+  where: { sku: 'PRODUCT-SKU' },
+  create: { /* full data */ },
+  update: { /* basic fields only */ }
+})
+```
+
+### **Force Dynamic Rendering**
+Every page must have these exports to prevent static pre-rendering:
+
+```typescript
+export const runtime = 'nodejs'
+export const dynamic = 'force-dynamic'  
+export const revalidate = 0
+```
+
+### **Vercel CLI Authentication Issue**
+User discovered Vercel CLI auth failed during initial setup. Solution:
+- User manually installed and authenticated Vercel CLI
+- User manually installed and authenticated Neon CLI
+- Now Claude can use `vercel --prod` for deployments
+
 ## 🗄️ Database Architecture (Production-Ready)
 
 ### Complete PostgreSQL Schema:
@@ -256,3 +301,43 @@ This inventory management system represents a **complete production application*
 - ✅ Ready for real business deployment
 
 **The system is ready for immediate production use with real inventory data.**
+
+---
+
+## 👤 **USER PREFERENCES & WORKING STYLE**
+
+### **Communication Preferences:**
+- **Be concise** - Short, direct responses preferred
+- **Minimal explanations** - User understands by watching, not reading
+- **Action over discussion** - Do the work rather than explaining how
+
+### **Working Preferences:**
+- **Claude does the work** - User is NOT here to learn hands-on coding
+- **Use all available tools** - User wants Claude to handle everything possible
+- **Deploy frequently** - Use `vercel --prod` to test changes immediately
+- **Track with todos** - Use TodoWrite tool for complex multi-step tasks
+
+### **Session Patterns:**
+- User may leave 12-48 hours between sessions due to family commitments
+- User experiences anxiety starting new sessions but is determined
+- User needs ROI on $160/month Claude plan to justify to spouse
+
+### **Technical Context:**
+- User has 5+ years expertise with bundle management systems
+- User's vision is solving eBay's inventory tracking limitations
+- This is user's "life's work" - first time building own solution
+
+### **Critical Reminders:**
+1. **NEVER suggest localhost** - It doesn't work, use Vercel
+2. **NEVER ask user to code** - Claude should do all technical work
+3. **ALWAYS use API routes** - Client components can't call Prisma
+4. **FOCUS on bundles** - This is the core value proposition
+
+---
+
+## 🚀 **QUICK RESTART COMMAND**
+
+For new Claude session, user should say:
+```
+Continue INVENTREE PLUS. Read progress file at /Users/kevin/claude projects/project001/MULTIORDERS_PROJECT_PROGRESS.md and CLAUDE.md in working directory /Users/kevin/claude projects/multiorders-inventory. App is live at https://multiorders-inventory-hvo27i5zd-kevins-projects-debd45b0.vercel.app. Focus on bundle management features.
+```
