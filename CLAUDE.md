@@ -2,13 +2,14 @@
 
 This file provides guidance to Claude Code (claude.ai/code) when working with code in this repository.
 
-## 🎯 Project Status: SUCCESSFULLY DEPLOYED TO PRODUCTION
+## 🎯 Project Status: AUTHENTICATION ISSUE IDENTIFIED
 
-This is **INVENTREE PLUS** - a fully functional multi-platform inventory management system with advanced bundle management. The application is 100% complete with database integration and is currently **LIVE IN PRODUCTION**.
+This is **INVENTREE PLUS** - a multi-platform inventory management system with advanced bundle management. The application has all pages created with proper structure, but there is a **CRITICAL AUTHENTICATION ISSUE** blocking API access.
 
-**Live Application**: https://multiorders-inventory-hvo27i5zd-kevins-projects-debd45b0.vercel.app  
+**Authentication Problem**: Vercel has enabled SSO on deployments, requiring login to access API routes  
+**Impact**: Products page shows "no data can be loaded" - API calls to `/api/bundles` are blocked  
 **Database**: Neon PostgreSQL (cloud) - fully connected and seeded with data  
-**Status**: ✅ Dashboard displaying real data, all features operational
+**Status**: 🔧 **BLOCKED** - Authentication must be resolved before functionality testing
 
 ## 📋 Project Continuation Guide
 
@@ -60,6 +61,26 @@ UPDATE: All deployment errors have been FIXED! ✅
 - eBay listing sells → finds linked Shopify product → identifies as bundle → deducts component SKUs
 - Critical for complex listings and quantity packs (e.g., 6-pack = 1 sale but 6 SKU deductions)
 - Prevents over-selling by maintaining accurate component inventory
+
+**CRITICAL BUNDLE BUSINESS RULES** (User has 5+ years expertise):
+
+**Product Types & Hierarchy:**
+- **ALL INVENTORY**: Default undesignated products (can be converted to other types)
+- **SIMPLE PRODUCTS**: Warehouse component SKUs - ONLY editable stock levels
+- **MERGED PRODUCTS**: Identical products combined from multiple sales channels  
+- **BUNDLED PRODUCTS**: Composed of SIMPLE product components
+
+**Business Logic Rules:**
+1. **SIMPLE Products**: Cannot become BUNDLE while used as component elsewhere, ONLY products with editable stock
+2. **BUNDLE Products**: Cannot be components in other bundles, cannot be merged
+3. **MERGED Products**: Cannot be used as components, cannot become bundles
+4. **Stock Flow**: All changes flow through SIMPLE products → automatically update linked products
+
+**Products Page Structure**: Must have horizontal tabs like multiorders screenshots:
+- "All Inventory" (undesignated products)
+- "Simple Products" (warehouse components) 
+- "Merged Products" (multi-channel combinations)
+- "Bundled Products" (component breakdowns)
 
 **Project Vision:** User has been sitting on multiple innovative project ideas for years, afraid to share due to potential theft. This represents their first step toward building their own solutions rather than explaining ideas to other developers.
 
@@ -328,10 +349,13 @@ This inventory management system represents a **complete production application*
 - This is user's "life's work" - first time building own solution
 
 ### **Critical Reminders:**
-1. **NEVER suggest localhost** - It doesn't work, use Vercel
-2. **NEVER ask user to code** - Claude should do all technical work
-3. **ALWAYS use API routes** - Client components can't call Prisma
-4. **FOCUS on bundles** - This is the core value proposition
+1. **AUTHENTICATION BLOCKING APIS** - Vercel SSO prevents API access (Aug 2025 issue)
+2. **NEVER suggest localhost** - It doesn't work, use Vercel
+3. **NEVER ask user to code** - Claude should do all technical work
+4. **ALWAYS use API routes** - Client components can't call Prisma
+5. **FOCUS on bundles** - This is the core value proposition
+6. **PRODUCTS PAGE NEEDS TABS** - Must implement horizontal tab structure
+7. **DASHBOARD NEEDS UPDATE** - Current version is deprecated, use screenshot 00004.png design
 
 ---
 
@@ -339,5 +363,7 @@ This inventory management system represents a **complete production application*
 
 For new Claude session, user should say:
 ```
-Continue INVENTREE PLUS. Read progress file at /Users/kevin/claude projects/project001/MULTIORDERS_PROJECT_PROGRESS.md and CLAUDE.md in working directory /Users/kevin/claude projects/multiorders-inventory. App is live at https://multiorders-inventory-hvo27i5zd-kevins-projects-debd45b0.vercel.app. Focus on bundle management features.
+Continue INVENTREE PLUS. Read progress file at /Users/kevin/claude projects/project001/MULTIORDERS_PROJECT_PROGRESS.md and CLAUDE.md in working directory /Users/kevin/claude projects/multiorders-inventory. 
+
+CRITICAL: Vercel authentication is blocking API access - products page shows "no data" because /api/bundles requires login. Fix authentication first, then implement horizontal tabs on products page (All Inventory, Simple, Merged, Bundled) and update dashboard to modern design from screenshots.
 ```
