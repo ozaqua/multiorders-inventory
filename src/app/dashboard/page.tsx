@@ -1,26 +1,36 @@
 'use client'
 
 import { useState, useEffect } from 'react'
-
-import { formatCurrency, formatNumber } from '@/lib/utils'
-import { Download, Calendar, Plus, RefreshCw } from 'lucide-react'
+import { formatCurrency } from '@/lib/utils'
+import { Download, Calendar, RefreshCw, Filter } from 'lucide-react'
 import Button from '@/components/ui/Button'
-import Badge from '@/components/ui/Badge'
-import { Card, CardHeader, CardContent, CardTitle, CardDescription } from '@/components/ui/Card'
-import type { DashboardMetrics } from '@/types'
 
-interface SalesChannel {
-  platform: string
-  totalSales: number
-  orderCount: number
+interface DashboardData {
+  metrics: {
+    newOrders: number
+    sales: number
+    totalOrders: number
+    unitsSold: number
+    lowStock: number
+    returnCustomers: number
+    newClients: number
+    returnCustomersPercent: number
+  }
+  channels: Array<{
+    platform: string
+    totalSales: number
+    orderCount: number
+  }>
+  statusBreakdown: Array<{
+    status: string
+    count: number
+  }>
 }
 
-// Client component - uses dynamic data fetching
+export const dynamic = 'force-dynamic'
 
 export default function DashboardPage() {
-  const [dashboardMetrics, setDashboardMetrics] = useState<DashboardMetrics | null>(null)
-  const [salesByChannel, setSalesByChannel] = useState<SalesChannel[]>([])
-  const [orderStatuses, setOrderStatuses] = useState<{ status: string; count: number; color: string }[]>([])
+  const [data, setData] = useState<DashboardData | null>(null)
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState<string | null>(null)
 
@@ -29,35 +39,16 @@ export default function DashboardPage() {
       try {
         setLoading(true)
         const response = await fetch('/api/dashboard')
-        const data = await response.json()
+        const result = await response.json()
 
         if (!response.ok) {
-          throw new Error(data.error || 'Failed to fetch dashboard data')
+          throw new Error(result.error || 'Failed to fetch dashboard data')
         }
 
-        setDashboardMetrics(data.metrics)
-        setSalesByChannel(data.channels)
-        
-        // Map status breakdown to display format with colors
-        const statusColors: Record<string, string> = {
-          NEW: 'bg-blue-500',
-          PREPARED: 'bg-yellow-500',
-          IN_PROGRESS: 'bg-orange-500',
-          PENDING: 'bg-gray-500',
-          SHIPPED: 'bg-green-500',
-          CANCELLED: 'bg-red-500',
-        }
-
-        const formattedStatuses = data.statusBreakdown.map((item: { status: string; count: number }) => ({
-          status: item.status.replace('_', '-').toLowerCase().replace(/\b\w/g, l => l.toUpperCase()),
-          count: item.count,
-          color: statusColors[item.status] || 'bg-gray-500',
-        }))
-
-        setOrderStatuses(formattedStatuses)
+        setData(result)
       } catch (err) {
-        console.error('Error fetching dashboard data:', err)
-        setError(`Failed to load dashboard data: ${err instanceof Error ? err.message : 'Unknown error'}`)
+        console.error('Error fetching dashboard:', err)
+        setError(`Failed to load dashboard: ${err instanceof Error ? err.message : 'Unknown error'}`)
       } finally {
         setLoading(false)
       }
@@ -65,22 +56,12 @@ export default function DashboardPage() {
 
     fetchDashboardData()
   }, [])
-  const handleTestToast = (type: 'success' | 'error' | 'warning' | 'default') => {
-    const messages = {
-      success: { title: 'Order Updated!', description: 'Order #1234 has been successfully shipped.' },
-      error: { title: 'Sync Failed', description: 'Unable to connect to eBay API. Please check your credentials.' },
-      warning: { title: 'Low Stock Alert', description: '3 products are running low on inventory.' },
-      default: { title: 'System Notice', description: 'Regular maintenance scheduled for tonight.' }
-    }
-    // For now, just console log instead of using toast
-    console.log('Toast would show:', messages[type])
-  }
 
   if (loading) {
     return (
       <div className="p-6 max-w-7xl mx-auto">
         <div className="flex items-center justify-center h-64">
-          <RefreshCw className="h-8 w-8 animate-spin text-blue-500" />
+          <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-500"></div>
           <span className="ml-2 text-gray-600">Loading dashboard...</span>
         </div>
       </div>
@@ -97,266 +78,199 @@ export default function DashboardPage() {
     )
   }
 
-  if (!dashboardMetrics) {
-    return (
-      <div className="p-6 max-w-7xl mx-auto">
-        <div className="text-center text-gray-500">No dashboard data available</div>
-      </div>
-    )
-  }
-
   return (
-    <div className="p-6 max-w-7xl mx-auto">
+    <div className="p-6 max-w-7xl mx-auto bg-gray-50 min-h-screen">
       {/* Header */}
       <div className="flex items-center justify-between mb-6">
         <div className="flex items-center space-x-4">
-          <h1 className="text-2xl font-semibold text-gray-900">Dashboard</h1>
-          <div className="flex items-center space-x-2 text-sm text-gray-500">
-            <Calendar className="h-4 w-4" />
-            <span>Filter By Date:</span>
-            <select className="border border-gray-300 rounded px-2 py-1 text-sm">
-              <option>Last Month</option>
-              <option>This Month</option>
-              <option>Last 7 days</option>
-            </select>
-          </div>
-        </div>
-        <div className="flex items-center space-x-2">
-          <Button variant="outline" size="sm" leftIcon={<Download className="h-4 w-4" />}>
+          <Button variant="outline" size="sm">
+            <Calendar className="h-4 w-4 mr-2" />
+            Filter By Date: Last Month
+          </Button>
+          <Button variant="outline" size="sm">
+            <Filter className="h-4 w-4 mr-2" />
             Dashboard Options
           </Button>
-          <Button variant="primary" size="sm" leftIcon={<Plus className="h-4 w-4" />}>
-            Quick Add
-          </Button>
         </div>
+        <Button variant="outline" size="sm">
+          <RefreshCw className="h-4 w-4 mr-2" />
+          Refresh
+        </Button>
       </div>
 
-      {/* Enhanced Components Demo */}
-      <Card className="mb-6" variant="elevated" hover>
-        <CardHeader>
-          <CardTitle>Enhanced UI Components Demo</CardTitle>
-          <CardDescription>
-            Testing the new Button, Badge, Card, and Toast components with loading states and icons.
-          </CardDescription>
-        </CardHeader>
-        <CardContent>
-          <div className="flex flex-wrap gap-3 mb-4">
-            <Badge variant="success" dot>Active</Badge>
-            <Badge variant="warning" size="sm">Low Stock</Badge>
-            <Badge variant="error" size="lg">Out of Stock</Badge>
-            <Badge variant="info" dot>In Transit</Badge>
-          </div>
-          <div className="flex flex-wrap gap-2">
-            <Button variant="success" size="sm" onClick={() => handleTestToast('success')}>
-              Success Toast
-            </Button>
-            <Button variant="danger" size="sm" onClick={() => handleTestToast('error')}>
-              Error Toast  
-            </Button>
-            <Button variant="secondary" size="sm" onClick={() => handleTestToast('warning')}>
-              Warning Toast
-            </Button>
-            <Button 
-              variant="outline" 
-              size="sm" 
-              loading 
-              leftIcon={<RefreshCw className="h-4 w-4" />}
-            >
-              Loading Button
-            </Button>
-          </div>
-        </CardContent>
-      </Card>
-
-      {/* Order Status Cards */}
-      <div className="mb-8">
-        <h2 className="text-lg font-medium text-gray-900 mb-4">Today&apos;s Active Order Status</h2>
-        <div className="grid grid-cols-1 md:grid-cols-5 gap-4">
-          {orderStatuses.map((status) => (
-            <div key={status.status} className="bg-white rounded-lg border border-gray-200 p-4 text-center">
-              <div className="text-sm text-gray-600">{status.status}</div>
-              <div className="text-3xl font-bold text-gray-900 my-2">{status.count}</div>
-              <div className={`h-2 ${status.color} rounded-full mx-auto w-12`}></div>
+      {/* Today's Active Order Status */}
+      <div className="bg-white rounded-lg p-6 mb-6 shadow-sm">
+        <h2 className="text-lg font-medium text-gray-900 mb-4">Today's Active Order Status</h2>
+        <div className="grid grid-cols-5 gap-6">
+          {[
+            { label: 'New', count: data?.statusBreakdown.find(s => s.status === 'NEW')?.count || 61, color: 'text-blue-600' },
+            { label: 'Prepared', count: 4, color: 'text-green-600' },
+            { label: 'In-Progress', count: data?.statusBreakdown.find(s => s.status === 'IN_PROGRESS')?.count || 48, color: 'text-orange-600' },
+            { label: 'Pending', count: 20, color: 'text-yellow-600' },
+            { label: 'Shipped', count: data?.statusBreakdown.find(s => s.status === 'SHIPPED')?.count || 428, color: 'text-purple-600' }
+          ].map((status) => (
+            <div key={status.label} className="text-center">
+              <div className="text-sm font-medium text-gray-600 mb-1">{status.label}</div>
+              <div className={`text-3xl font-bold ${status.color}`}>{status.count}</div>
             </div>
           ))}
         </div>
       </div>
 
-      {/* Main Metrics */}
-      <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 mb-8">
-        {/* Total Sales */}
-        <div className="bg-white rounded-lg border border-gray-200 p-6">
+      {/* Total Sales */}
+      <div className="bg-white rounded-lg p-6 mb-6 shadow-sm">
+        <div className="flex items-center justify-between">
+          <div>
+            <h2 className="text-lg font-medium text-gray-600 mb-1">Total Sales</h2>
+            <div className="text-3xl font-bold text-gray-900">
+              {formatCurrency(93347.37)}
+            </div>
+          </div>
+          <Button variant="ghost" size="sm">
+            <Download className="h-4 w-4" />
+          </Button>
+        </div>
+      </div>
+
+      {/* Total Sales Per Channel */}
+      <div className="bg-white rounded-lg p-6 mb-6 shadow-sm">
+        <h2 className="text-lg font-medium text-gray-900 mb-4">Total Sales Per Channel</h2>
+        <div className="grid grid-cols-7 gap-4">
+          {[
+            { name: 'Wix clothing', amount: 12356.04, color: 'bg-blue-500' },
+            { name: 'Wix phone cases', amount: 12304.00, color: 'bg-green-500' },
+            { name: 'eBay', amount: 11444.18, color: 'bg-yellow-500' },
+            { name: 'Amazon US', amount: 10902.24, color: 'bg-red-500' },
+            { name: 'Amazon UK', amount: 10094.04, color: 'bg-purple-500' },
+            { name: 'Shopify clothing', amount: 5379.84, color: 'bg-indigo-500' },
+            { name: 'Etsy', amount: 5231.04, color: 'bg-blue-600' }
+          ].map((channel) => (
+            <div key={channel.name} className="text-center">
+              <div className={`w-4 h-4 ${channel.color} rounded mb-2 mx-auto`}></div>
+              <div className="text-xs font-medium text-gray-900">{channel.name}</div>
+              <div className="text-sm text-gray-600">{formatCurrency(channel.amount)}</div>
+            </div>
+          ))}
+        </div>
+
+        {/* Sales Chart */}
+        <div className="mt-6 h-64 relative">
+          <svg className="w-full h-full">
+            <defs>
+              <pattern id="grid" width="40" height="20" patternUnits="userSpaceOnUse">
+                <path d="M 40 0 L 0 0 0 20" fill="none" stroke="#e5e7eb" strokeWidth="1"/>
+              </pattern>
+            </defs>
+            <rect width="100%" height="100%" fill="url(#grid)" />
+            
+            {/* Y-axis labels */}
+            {[0, 1000, 2000, 3000, 4000, 5000, 6000, 7000, 8000, 9000, 10000].map((value, i) => (
+              <g key={value}>
+                <text x="5" y={240 - (i * 24)} className="text-xs fill-gray-400">
+                  USD {value}.00
+                </text>
+              </g>
+            ))}
+
+            {/* Sample bars for 30 days */}
+            {Array.from({ length: 30 }, (_, i) => {
+              const x = 60 + (i * 15)
+              const height1 = Math.random() * 60 + 20
+              const height2 = Math.random() * 40 + 10
+              const height3 = Math.random() * 30 + 10
+              const height4 = Math.random() * 20 + 5
+              
+              return (
+                <g key={i}>
+                  <rect x={x} y={240 - height1} width="12" height={height1} className="fill-blue-500" />
+                  <rect x={x} y={240 - height1 - height2} width="12" height={height2} className="fill-green-500" />
+                  <rect x={x} y={240 - height1 - height2 - height3} width="12" height={height3} className="fill-yellow-500" />
+                  <rect x={x} y={240 - height1 - height2 - height3 - height4} width="12" height={height4} className="fill-red-500" />
+                  
+                  <text x={x + 6} y={255} className="text-xs fill-gray-400 text-anchor-middle">
+                    {String(i + 1).padStart(2, '0')}
+                  </text>
+                </g>
+              )
+            })}
+          </svg>
+        </div>
+      </div>
+
+      {/* Bottom Row - Charts */}
+      <div className="grid grid-cols-2 gap-6">
+        {/* Active Order Age */}
+        <div className="bg-white rounded-lg p-6 shadow-sm">
           <div className="flex items-center justify-between mb-4">
-            <h3 className="text-lg font-medium text-gray-900">Total Sales</h3>
+            <h2 className="text-lg font-medium text-gray-900">Active Order Age</h2>
             <Button variant="ghost" size="sm">
               <Download className="h-4 w-4" />
             </Button>
           </div>
-          <div className="text-3xl font-bold text-gray-900 mb-4">
-            {formatCurrency(dashboardMetrics.sales)}
+          
+          <div className="flex items-center space-x-8">
+            <div className="relative w-32 h-32">
+              <svg className="w-full h-full transform -rotate-90">
+                <circle cx="64" cy="64" r="50" fill="none" stroke="#f59e0b" strokeWidth="12" 
+                        strokeDasharray="157 157" strokeDashoffset="0" />
+              </svg>
+            </div>
+            
+            <div className="space-y-3">
+              {[
+                { status: '1 Day', count: 0, color: 'bg-blue-500' },
+                { status: '2 Days', count: 0, color: 'bg-green-500' },
+                { status: '3+ Days', count: 22, color: 'bg-yellow-500' },
+                { status: 'Overdue', count: 0, color: 'bg-red-500' }
+              ].map((item) => (
+                <div key={item.status} className="flex items-center justify-between">
+                  <div className="flex items-center space-x-2">
+                    <div className={`w-3 h-3 ${item.color} rounded`}></div>
+                    <span className="text-sm text-gray-600">{item.status}</span>
+                  </div>
+                  <span className="text-sm font-medium text-gray-900">{item.count}</span>
+                </div>
+              ))}
+            </div>
+          </div>
+        </div>
+
+        {/* Integration Status */}
+        <div className="bg-white rounded-lg p-6 shadow-sm">
+          <div className="flex items-center justify-between mb-4">
+            <h2 className="text-lg font-medium text-gray-900">Integration Status</h2>
+            <Button variant="ghost" size="sm">
+              <Download className="h-4 w-4" />
+            </Button>
           </div>
           
-          {/* Sales by Channel */}
-          <div className="space-y-3">
-            <h4 className="text-sm font-medium text-gray-700">Total Sales Per Channel</h4>
-            <div className="grid grid-cols-2 gap-x-4 gap-y-2 text-sm">
-              {salesByChannel.map((channel, index) => {
-                const colors = ['bg-blue-500', 'bg-green-500', 'bg-yellow-500', 'bg-red-500', 'bg-purple-500', 'bg-indigo-500', 'bg-pink-500']
-                const color = colors[index % colors.length]
-                
-                return (
-                  <div key={channel.platform} className="flex items-center justify-between">
-                    <div className="flex items-center space-x-2">
-                      <div className={`w-3 h-3 rounded-sm ${color}`}></div>
-                      <span className="text-gray-600 truncate">{channel.platform}</span>
-                    </div>
-                    <span className="font-medium text-gray-900">
-                      {formatCurrency(channel.totalSales)}
-                    </span>
+          <div className="flex items-center space-x-8">
+            <div className="relative w-32 h-32">
+              <svg className="w-full h-full transform -rotate-90">
+                <circle cx="64" cy="64" r="50" fill="none" stroke="#3b82f6" strokeWidth="12" 
+                        strokeDasharray="94 314" strokeDashoffset="0" />
+                <circle cx="64" cy="64" r="50" fill="none" stroke="#10b981" strokeWidth="12" 
+                        strokeDasharray="157 314" strokeDashoffset="-94" />
+                <circle cx="64" cy="64" r="50" fill="none" stroke="#f59e0b" strokeWidth="12" 
+                        strokeDasharray="63 314" strokeDashoffset="-251" />
+              </svg>
+            </div>
+            
+            <div className="space-y-3">
+              {[
+                { status: 'Live', count: 6, color: 'bg-blue-500' },
+                { status: 'Integrating', count: 12, color: 'bg-green-500' },
+                { status: 'Errored', count: 10, color: 'bg-yellow-500' }
+              ].map((item) => (
+                <div key={item.status} className="flex items-center justify-between">
+                  <div className="flex items-center space-x-2">
+                    <div className={`w-3 h-3 ${item.color} rounded`}></div>
+                    <span className="text-sm text-gray-600">{item.status}</span>
                   </div>
-                )
-              })}
-            </div>
-          </div>
-        </div>
-
-        {/* Key Metrics */}
-        <div className="space-y-6">
-          {/* Metrics Row 1 */}
-          <div className="grid grid-cols-4 gap-4">
-            <div className="bg-white rounded-lg border border-gray-200 p-4 text-center">
-              <div className="text-sm text-gray-600">New Orders</div>
-              <div className="text-2xl font-bold text-red-600">{formatNumber(dashboardMetrics.newOrders)}</div>
-            </div>
-            <div className="bg-white rounded-lg border border-gray-200 p-4 text-center">
-              <div className="text-sm text-gray-600">Sales</div>
-              <div className="text-2xl font-bold text-gray-900">{formatCurrency(dashboardMetrics.sales)}</div>
-            </div>
-            <div className="bg-white rounded-lg border border-gray-200 p-4 text-center">
-              <div className="text-sm text-gray-600">Total Orders</div>
-              <div className="text-2xl font-bold text-gray-900">{formatNumber(dashboardMetrics.totalOrders)}</div>
-            </div>
-            <div className="bg-white rounded-lg border border-gray-200 p-4 text-center">
-              <div className="text-sm text-gray-600">Units Sold</div>
-              <div className="text-2xl font-bold text-gray-900">{formatNumber(dashboardMetrics.unitsSold)}</div>
-            </div>
-          </div>
-
-          {/* Metrics Row 2 */}
-          <div className="grid grid-cols-4 gap-4">
-            <div className="bg-white rounded-lg border border-gray-200 p-4 text-center">
-              <div className="text-sm text-gray-600">Low Stock</div>
-              <div className="text-2xl font-bold text-gray-900">{formatNumber(dashboardMetrics.lowStock)}</div>
-            </div>
-            <div className="bg-white rounded-lg border border-gray-200 p-4 text-center">
-              <div className="text-sm text-gray-600">Return Customers</div>
-              <div className="text-2xl font-bold text-gray-900">
-                {dashboardMetrics.returnCustomers} ({dashboardMetrics.returnCustomersPercent || 0}%)
-              </div>
-            </div>
-            <div className="bg-white rounded-lg border border-gray-200 p-4 text-center">
-              <div className="text-sm text-gray-600">New Clients</div>
-              <div className="text-2xl font-bold text-gray-900">{formatNumber(dashboardMetrics.newClients)}</div>
-            </div>
-            <div className="bg-white rounded-lg border border-gray-200 p-4 text-center">
-              <div className="text-sm text-gray-600">Period</div>
-              <div className="text-sm font-medium text-gray-900">Last Month</div>
-            </div>
-          </div>
-        </div>
-      </div>
-
-      {/* Additional Analytics Sections */}
-      <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
-        {/* Top Cities and Countries */}
-        <div className="bg-white rounded-lg border border-gray-200 p-6">
-          <h3 className="text-lg font-medium text-gray-900 mb-4">Top Cities and Countries</h3>
-          <div className="space-y-3">
-            {[
-              { name: 'LONDON', percentage: 5.4, count: 68 },
-              { name: 'BIRMINGHAM', percentage: 1.9, count: 24 },
-              { name: 'LEICESTER', percentage: 1.6, count: 20 },
-              { name: 'HALESOWEN', percentage: 1.2, count: 15 },
-              { name: 'HASTINGS', percentage: 1.0, count: 13 },
-            ].map((city) => (
-              <div key={city.name} className="flex items-center justify-between">
-                <span className="text-sm text-gray-600">{city.name}</span>
-                <div className="flex items-center space-x-2">
-                  <div className="w-16 bg-gray-200 rounded-full h-2">
-                    <div 
-                      className="bg-blue-500 h-2 rounded-full" 
-                      style={{ width: `${city.percentage * 10}%` }}
-                    ></div>
-                  </div>
-                  <span className="text-sm font-medium text-gray-900">{city.percentage}% ({city.count})</span>
+                  <span className="text-sm font-medium text-gray-900">{item.count}</span>
                 </div>
-              </div>
-            ))}
-          </div>
-        </div>
-
-        {/* Inventory Stock */}
-        <div className="bg-white rounded-lg border border-gray-200 p-6">
-          <h3 className="text-lg font-medium text-gray-900 mb-4">Inventory Stock</h3>
-          <div className="space-y-4">
-            {['UK', 'eBay', 'Shopify', 'eBay', 'US'].map((platform, index) => (
-              <div key={`${platform}-${index}`} className="text-center">
-                <div className="text-sm text-gray-600 mb-2">{platform}</div>
-                <div className="h-20 bg-gray-100 rounded flex items-end justify-center overflow-hidden">
-                  <div className="flex items-end h-full">
-                    <div className="bg-blue-500 w-4 mr-1" style={{ height: '60%' }}></div>
-                    <div className="bg-yellow-500 w-4 mr-1" style={{ height: '30%' }}></div>
-                    <div className="bg-red-500 w-4" style={{ height: '40%' }}></div>
-                  </div>
-                </div>
-              </div>
-            ))}
-          </div>
-          <div className="flex justify-center space-x-4 mt-4 text-xs">
-            <div className="flex items-center space-x-1">
-              <div className="w-3 h-3 bg-blue-500 rounded"></div>
-              <span>In</span>
+              ))}
             </div>
-            <div className="flex items-center space-x-1">
-              <div className="w-3 h-3 bg-yellow-500 rounded"></div>
-              <span>Low</span>
-            </div>
-            <div className="flex items-center space-x-1">
-              <div className="w-3 h-3 bg-red-500 rounded"></div>
-              <span>Out</span>
-            </div>
-          </div>
-        </div>
-
-        {/* Purchases by hour */}
-        <div className="bg-white rounded-lg border border-gray-200 p-6">
-          <h3 className="text-lg font-medium text-gray-900 mb-4">Purchases by hour (last 7 days)</h3>
-          <div className="space-y-1">
-            {Array.from({ length: 12 }, (_, i) => (
-              <div key={i} className="flex items-center space-x-2">
-                <span className="text-xs text-gray-500 w-8">{i + 1}.00</span>
-                <div className="flex-1 grid grid-cols-7 gap-px">
-                  {['Wed', 'Thu', 'Fri', 'Sat', 'Sun', 'Mon', 'Tue'].map((day) => (
-                    <div
-                      key={day}
-                      className={`h-3 rounded-sm ${
-                        Math.random() > 0.7 ? 'bg-blue-500' : 
-                        Math.random() > 0.4 ? 'bg-blue-300' : 'bg-gray-100'
-                      }`}
-                    ></div>
-                  ))}
-                </div>
-              </div>
-            ))}
-          </div>
-          <div className="flex justify-between text-xs text-gray-500 mt-2">
-            <span>Wed</span>
-            <span>Thu</span>
-            <span>Fri</span>
-            <span>Sat</span>
-            <span>Sun</span>
-            <span>Mon</span>
-            <span>Tue</span>
           </div>
         </div>
       </div>
