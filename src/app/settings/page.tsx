@@ -130,7 +130,7 @@ export default function SettingsPage() {
       ...prev,
       [type]: {
         ...prev[type],
-        [key]: !prev[type][key as keyof typeof prev[type]]
+        [key]: !(prev[type] as Record<string, boolean>)[key]
       }
     }))
   }
