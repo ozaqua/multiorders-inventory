@@ -2,7 +2,6 @@
 
 import { useState, useEffect } from 'react'
 
-import { getBundledProducts } from '@/lib/database/products'
 import type { ProductWithRelations } from '@/types'
 import Button from '@/components/ui/Button'
 import Badge from '@/components/ui/Badge'
@@ -54,8 +53,14 @@ export default function ProductsPage() {
     async function fetchBundles() {
       try {
         setLoading(true)
-        const bundleData = await getBundledProducts()
-        setBundles(bundleData as BundleProduct[])
+        const response = await fetch('/api/bundles')
+        const data = await response.json()
+
+        if (!response.ok) {
+          throw new Error(data.error || 'Failed to fetch bundle data')
+        }
+
+        setBundles(data.bundles as BundleProduct[])
       } catch (err) {
         console.error('Error fetching bundles:', err)
         setError(`Failed to load bundle products: ${err instanceof Error ? err.message : 'Unknown error'}`)
