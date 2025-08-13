@@ -108,9 +108,9 @@ export default function ProductsPage() {
     
     switch (activeTab) {
       case 'all':
-        // All inventory - undesignated products
+        // All inventory - undesignated products (configurable by default)
         filteredData = allProducts.filter(product => 
-          !product.category || product.category === 'STANDARD'
+          product.category === 'CONFIGURABLE' || !product.category
         )
         break
       case 'simple':
@@ -213,7 +213,7 @@ export default function ProductsPage() {
                 <span>{tab.label}</span>
                 <span className="ml-2 py-0.5 px-2 rounded-full text-xs bg-gray-100 text-gray-600">
                   {activeTab === 'bundled' ? bundles.length : 
-                   activeTab === 'all' ? allProducts.filter(p => !p.category || p.category === 'STANDARD').length :
+                   activeTab === 'all' ? allProducts.filter(p => !p.category || p.category === 'CONFIGURABLE').length :
                    allProducts.filter(p => p.category === tab.id.toUpperCase()).length}
                 </span>
               </button>
