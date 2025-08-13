@@ -306,9 +306,8 @@ export default function ProductsPage() {
 }
 
 // Product Card Component
-function ProductCard({ product, activeTab }: { 
-  product: ProductWithRelations | BundleProduct, 
-  activeTab: string 
+function ProductCard({ product }: { 
+  product: ProductWithRelations | BundleProduct
 }) {
   const isBundle = 'components' in product
   
