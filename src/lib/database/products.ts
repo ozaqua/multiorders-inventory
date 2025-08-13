@@ -167,7 +167,7 @@ export async function getBundledProducts() {
         quantityNeeded: bundleComponent.quantityNeeded,
         availableStock: bundleComponent.component.warehouse?.available || 0,
       })),
-      retailPrice: bundle.prices.find((p) => p.platform === 'MULTIORDERS')?.price || 0,
+      retailPrice: bundle.prices.find((p) => p.platform === 'EBAY')?.price || 0,
     }))
   } catch (error) {
     console.error('Error fetching bundled products:', error)
