@@ -3,7 +3,7 @@
 import { useState, useEffect } from 'react'
 import Button from '@/components/ui/Button'
 import Badge from '@/components/ui/Badge'
-import { Card, CardHeader, CardContent, CardTitle, CardDescription } from '@/components/ui/Card'
+import { Card, CardContent } from '@/components/ui/Card'
 import { 
   GitMerge,
   Search,
@@ -15,7 +15,6 @@ import {
   AlertCircle,
   RefreshCw,
   Eye,
-  Copy
 } from 'lucide-react'
 import { formatCurrency } from '@/lib/utils'
 
@@ -565,7 +564,7 @@ export default function MergePage() {
                 <div>
                   <h3 className="text-lg font-medium text-gray-900 mb-4">Duplicate Products</h3>
                   <div className="space-y-4">
-                    {selectedCandidate.duplicates.map((duplicate, index) => (
+                    {selectedCandidate.duplicates.map((duplicate) => (
                       <div key={duplicate.id} className="bg-yellow-50 border border-yellow-200 rounded-lg p-4">
                         <div className="grid grid-cols-2 gap-4">
                           <div>
